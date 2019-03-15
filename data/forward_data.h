@@ -2,8 +2,8 @@
 
 #include "data_model_base.h"
 
-template<typename T>
-class forward_data:public data_model_base<T>
+template<typename floatT>
+class forward_data:public data_model_base<floatT>
 {
 	using string=std::string;
 	static constexpr char first_name[] = "time";

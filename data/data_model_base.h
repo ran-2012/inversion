@@ -1,15 +1,14 @@
 #pragma once
 
 #include "requirements.h"
-#include <iostream>
 
-template<typename T>
+template<typename floatT = float>
 class data_model_base
 {
 	using json=nlohmann::json;
 
 	using string=std::string;
-	using pair=std::pair<T,T>;
+	using pair=std::pair<floatT,floatT>;
 	using vector=std::vector<pair>;
 
 	using size_t=unsigned int;
@@ -17,7 +16,7 @@ class data_model_base
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
 
-	virtual string  _version() { return string("version"); }
+	virtual string _version() { return string("version"); }
 	virtual string _name() { return string("name"); }
 	virtual string _comment() { return string("comment"); }
 	virtual string _count() { return string("count"); }
@@ -38,9 +37,16 @@ public:
 
 	data_model_base()
 	{
+		if(!std::is_floating_point<floatT>::value)
+		{
+			throw std::invalid_argument("模板参数floatT不是浮点数");
+		}
 		count = 0;
 	}
-	virtual ~data_model_base(){}
+	virtual ~data_model_base()
+	{
+		
+	}
 	
 	virtual void load_from_file(const string& path) final
 	{
@@ -115,14 +121,14 @@ public:
 			std::cerr << e.what() << std::endl;
 			comment = default_comment;
 		}
-		count = j[_count()].get<T>();
+		count = j[_count()].get<floatT>();
 
 		data.clear();
 		json data_j = j[_data()];
 		for(auto it=data_j.begin();it!=data_j.end();++it)
 		{
-			T first_data = (*it)[_first_name()].get<T>();
-			T second_data = (*it)[_second_name()].get<T>();
+			floatT first_data = (*it)[_first_name()].get<floatT>();
+			floatT second_data = (*it)[_second_name()].get<floatT>();
 			data.emplace_back(first_data, second_data);
 		}
 		if(count!=data.size())

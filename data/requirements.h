@@ -1,10 +1,12 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-
+#include <type_traits>
+#include <iostream>
 #include <fstream>
 #include <sstream>
-#include <exception>
 #include <string>
 #include <vector>
+#include <exception>
 #include <utility>
+
+#include <nlohmann/json.hpp>
