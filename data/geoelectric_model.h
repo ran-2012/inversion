@@ -16,14 +16,19 @@ class geoelectric_model :public data_model_base<T>
 	string _first_name() override { return first_name;}
 	string _second_name() override { return second_name; }
 	virtual string _layer_height() { return string("layer_height"); }
-
+	
+	void load_additional_data(const json& j) override
+	{
+		layer_height = j[_layer_height()].get<string>();
+	}
+	json save_additional_data() override
+	{
+		json patch_j;
+		patch_j[_layer_height()] = layer_height;
+		return patch_j;
+	}
 
 public:
 	T layer_height;
 
-	void load_from_json(const json& j) override
-	{
-		data_model_base<T>::load_from_json(j);
-
-	}
 };

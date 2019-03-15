@@ -14,6 +14,9 @@ class data_model_base
 
 	using size_t=unsigned int;
 
+	static constexpr char default_version[] = "0.1.0";
+	static constexpr char default_comment[] = "";
+
 	virtual string  _version() { return string("version"); }
 	virtual string _name() { return string("name"); }
 	virtual string _comment() { return string("comment"); }
@@ -22,13 +25,10 @@ class data_model_base
 	virtual string _first_name() { return string(""); };
 	virtual string _second_name() { return string(""); };
 
+	virtual void load_additional_data(const json& j) = 0;
+	virtual json save_additional_data() = 0;
+
 public:
-	data_model_base()
-	{
-		count = 0;
-	}
-	virtual ~data_model_base(){}
-	
 	string version;
 	string name;
 	string comment;
@@ -36,6 +36,12 @@ public:
 	size_t count;
 	vector data;
 
+	data_model_base()
+	{
+		count = 0;
+	}
+	virtual ~data_model_base(){}
+	
 	virtual void load_from_file(const string& path) final
 	{
 		std::ifstream input_file;
@@ -90,9 +96,25 @@ public:
 	}
 	virtual void load_from_json(const json& j)
 	{
-		version = j[_version()].get<string>();
+		try
+		{
+			version = j[_version()].get<string>();
+		}
+		catch (json::type_error &e)
+		{
+			std::cerr << e.what() << std::endl;
+			version = default_version;
+		}
 		name = j[_name()].get<string>();
-		comment = j[_comment()].get<string>();
+		try
+		{
+			comment = j[_comment()].get<string>();
+		}
+		catch (json::type_error &e)
+		{
+			std::cerr << e.what() << std::endl;
+			comment = default_comment;
+		}
 		count = j[_count()].get<T>();
 
 		data.clear();
@@ -103,6 +125,16 @@ public:
 			T second_data = (*it)[_second_name()].get<T>();
 			data.emplace_back(first_data, second_data);
 		}
+		if(count!=data.size())
+		{
+			std::cerr << "Json中count与实际不符" << std::endl;
+			count = data.size();
+		}
+		load_additional_data(j);
+	}
+	virtual void save_to_json(json& j)
+	{
+		j = save_to_json();
 	}
 	virtual json save_to_json()
 	{
@@ -121,6 +153,8 @@ public:
 			data_j.emplace_back(unit_j);
 		}
 		j[_data()] = std::move(data_j);
-		return j;
+
+		json patch_j = save_additional_data();
+		return j.patch(patch_j);
 	}
 };
