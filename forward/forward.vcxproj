@@ -72,18 +72,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;E:\Projects\include;$(IncludePath)</IncludePath>
     <TargetExt>.pyd</TargetExt>
+    <LibraryPath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;E:\Projects\include;$(IncludePath)</IncludePath>
     <TargetExt>.pyd</TargetExt>
+    <LibraryPath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;E:\Projects\include;$(IncludePath)</IncludePath>
     <TargetExt>.pyd</TargetExt>
+    <LibraryPath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;E:\Projects\include;$(IncludePath)</IncludePath>
     <TargetExt>.pyd</TargetExt>
+    <LibraryPath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -162,11 +166,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="forward.cpp" />
+    <ClCompile Include="forward_py.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="forward.h" />
-    <ClInclude Include="requirements.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

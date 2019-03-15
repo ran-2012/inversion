@@ -1,4 +1,3 @@
-#pragma once
 
 #include <pybind11/pybind11.h>
 
@@ -11,3 +10,13 @@
 #include "../data/data.h"
 #include "../data/global.h"
 #include "../forward_gpu/forward_gpu.h"
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(forward_py, m)
+{
+	m.doc() = "ÕýÑÝÄ£¿é";
+
+
+}
+

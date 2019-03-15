@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="forward_data.h">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="geoelectric_model.h">
-      <Filter>头文件</Filter>
+    <ClCompile Include="data_py.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="requirements.h">
+    <ClInclude Include="data_model_base.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="data_model_base.h">
+    <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
