@@ -11,7 +11,7 @@ class data_model_base
 	using pair=std::pair<FloatT,FloatT>;
 	using vector=std::vector<pair>;
 
-	using size_t=unsigned int;
+	using size_type=typename vector::size_type;
 
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
@@ -21,8 +21,8 @@ class data_model_base
 		if (!std::is_floating_point<FloatT>::value)
 		{
 			std::stringstream msg;
-			msg << "模板参数floatT不是浮点数";
-			msg << "其中floatT为 ";
+			msg << u8"模板参数floatT不是浮点数";
+			msg << u8"其中floatT为 ";
 			msg << typeid(FloatT).name();
 			throw std::invalid_argument(msg.str());
 		}
@@ -44,7 +44,7 @@ public:
 	string name;
 	string comment;
 
-	size_t count;
+	size_type count;
 	vector data;
 
 	data_model_base()
@@ -61,10 +61,7 @@ public:
 	{
 		*this = std::move(d);
 	}
-	virtual ~data_model_base()
-	{
-		
-	}
+	virtual ~data_model_base() = default;
 
 	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
 	{
@@ -75,7 +72,7 @@ public:
 		data = d.data;
 		return *this;
 	}
-	data_model_base<FloatT>& operator=(const data_model_base<FloatT>&& d) noexcept
+	data_model_base<FloatT>& operator=(data_model_base<FloatT>&& d) noexcept
 	{
 		version = std::move(d.version);
 		name = std::move(d.name);
@@ -96,7 +93,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "文件打开失败" << std::endl;
+			std::cerr << u8"文件打开失败" << std::endl;
 			return;
 		}
 		try
@@ -107,7 +104,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "加载JSON失败" << " " << path << std::endl;
+			std::cerr << u8"加载JSON失败" << " " << path << std::endl;
 			return;
 		}
 		load_from_json(j);
@@ -123,7 +120,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "文件打开失败" << std::endl;
+			std::cerr << u8"文件打开失败" << std::endl;
 			return;
 		}
 		try
@@ -134,7 +131,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "文件写入失败" << " " << path << std::endl;
+			std::cerr << u8"文件写入失败" << " " << path << std::endl;
 		}
 	}
 	virtual void load_from_json(const json& j)
@@ -158,19 +155,19 @@ public:
 			std::cerr << e.what() << std::endl;
 			comment = default_comment;
 		}
-		count = j[_count()].get<FloatT>();
+		count = j[_count()].get<size_type>();
 
 		data.clear();
 		json data_j = j[_data()];
-		for(auto it=data_j.begin();it!=data_j.end();++it)
+		for(auto& item : data_j)
 		{
-			FloatT first_data = (*it)[_first_name()].get<FloatT>();
-			FloatT second_data = (*it)[_second_name()].get<FloatT>();
+			auto first_data = item[_first_name()].get<FloatT>();
+			auto second_data = item[_second_name()].get<FloatT>();
 			data.emplace_back(first_data, second_data);
 		}
 		if(count!=data.size())
 		{
-			std::cerr << "Json中count与实际不符" << std::endl;
+			std::cerr << u8"Json中count与实际不符" << std::endl;
 			count = data.size();
 		}
 		load_additional_data(j);

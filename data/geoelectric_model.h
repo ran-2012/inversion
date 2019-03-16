@@ -19,7 +19,7 @@ class geoelectric_model :public data_model_base<FloatT>
 	
 	void load_additional_data(const json& j) override
 	{
-		layer_height = j[_layer_height()].get<string>();
+		layer_height = j[_layer_height()].get<FloatT>();
 	}
 	json save_additional_data() override
 	{
