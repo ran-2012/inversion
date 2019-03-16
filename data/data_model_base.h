@@ -2,19 +2,31 @@
 
 #include "requirements.h"
 
-template<typename floatT = float>
+template<typename FloatT = float>
 class data_model_base
 {
 	using json=nlohmann::json;
 
 	using string=std::string;
-	using pair=std::pair<floatT,floatT>;
+	using pair=std::pair<FloatT,FloatT>;
 	using vector=std::vector<pair>;
 
 	using size_t=unsigned int;
 
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
+
+	void check_type()
+	{
+		if (!std::is_floating_point<FloatT>::value)
+		{
+			std::stringstream msg;
+			msg << "模板参数floatT不是浮点数";
+			msg << "其中floatT为 ";
+			msg << typeid(FloatT).name();
+			throw std::invalid_argument(msg.str());
+		}
+	}
 
 	virtual string _version() { return string("version"); }
 	virtual string _name() { return string("name"); }
@@ -24,8 +36,8 @@ class data_model_base
 	virtual string _first_name() { return string(""); };
 	virtual string _second_name() { return string(""); };
 
-	virtual void load_additional_data(const json& j) = 0;
-	virtual json save_additional_data() = 0;
+	virtual void load_additional_data(const json& j) {}
+	virtual json save_additional_data() { return json(); }
 
 public:
 	string version;
@@ -37,17 +49,42 @@ public:
 
 	data_model_base()
 	{
-		if(!std::is_floating_point<floatT>::value)
-		{
-			throw std::invalid_argument("模板参数floatT不是浮点数");
-		}
+		check_type();
 		count = 0;
+	}
+	data_model_base(const data_model_base<FloatT>& d)
+	{
+		check_type();
+		*this = d;
+	}
+	data_model_base(data_model_base<FloatT>&& d) noexcept
+	{
+		*this = std::move(d);
 	}
 	virtual ~data_model_base()
 	{
 		
 	}
-	
+
+	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
+	{
+		version = d.version;
+		name = d.name;
+		comment = d.comment;
+		count = d.count;
+		data = d.data;
+		return *this;
+	}
+	data_model_base<FloatT>& operator=(const data_model_base<FloatT>&& d) noexcept
+	{
+		version = std::move(d.version);
+		name = std::move(d.name);
+		comment = std::move(d.comment);
+		count = d.count;
+		data = std::move(d.data);
+		return *this;
+	}
+
 	virtual void load_from_file(const string& path) final
 	{
 		std::ifstream input_file;
@@ -121,14 +158,14 @@ public:
 			std::cerr << e.what() << std::endl;
 			comment = default_comment;
 		}
-		count = j[_count()].get<floatT>();
+		count = j[_count()].get<FloatT>();
 
 		data.clear();
 		json data_j = j[_data()];
 		for(auto it=data_j.begin();it!=data_j.end();++it)
 		{
-			floatT first_data = (*it)[_first_name()].get<floatT>();
-			floatT second_data = (*it)[_second_name()].get<floatT>();
+			FloatT first_data = (*it)[_first_name()].get<FloatT>();
+			FloatT second_data = (*it)[_second_name()].get<FloatT>();
 			data.emplace_back(first_data, second_data);
 		}
 		if(count!=data.size())

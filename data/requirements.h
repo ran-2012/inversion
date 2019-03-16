@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <typeinfo>
 #include <iostream>
 #include <fstream>
 #include <sstream>

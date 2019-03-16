@@ -2,13 +2,13 @@
 
 #include "data_model_base.h"
 
-template<typename floatT>
-class geoelectric_model :public data_model_base<floatT>
+template<typename FloatT>
+class geoelectric_model :public data_model_base<FloatT>
 {
 	using json=nlohmann::json;
 
 	using string=std::string;
-	using pair=std::pair<floatT, floatT>;
+	using pair=std::pair<FloatT, FloatT>;
 	using vector=std::vector<pair>;
 
 	static constexpr char first_name[] = "number_of_layer";
@@ -29,6 +29,27 @@ class geoelectric_model :public data_model_base<floatT>
 	}
 
 public:
-	floatT layer_height;
+	FloatT layer_height;
 
+	geoelectric_model(const geoelectric_model<FloatT>& g) :data_model_base<FloatT>(g)
+	{
+		layer_height = g.layer_height;
+	}
+	geoelectric_model(geoelectric_model<FloatT>&& g)noexcept :data_model_base<FloatT>(std::move(g))
+	{
+		layer_height = std::move(g.layer_height);
+	}
+
+	geoelectric_model<FloatT>& operator=(const geoelectric_model<FloatT>& g)
+	{
+		*this = data_model_base<FloatT>::operator=(g);
+		layer_height = g.layer_height;
+		return *this;
+	}
+	geoelectric_model<FloatT>& operator=(geoelectric_model<FloatT>&& g) noexcept
+	{
+		*this = data_model_base<FloatT>::operator=(std::move(g));
+		layer_height = std::move(g.layer_height);
+		return *this;
+	}
 };
