@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "comment": "this is test data",
+  "data": [
+    {
+      "number_of_layer": 1,
+      "resistivity": 100
+    },
+    {
+      "number_of_layer": 2,
+      "resistivity": 200
+    }
+  ],
+  "count": 3,
+  "layer_height": 10 
+}

@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include "requirements.h"
 
@@ -21,8 +21,8 @@ class data_model_base
 		if (!std::is_floating_point<FloatT>::value)
 		{
 			std::stringstream msg;
-			msg << u8"ƒ£∞Â≤Œ ˝floatT≤ª «∏°µ„ ˝";
-			msg << u8"∆‰÷–floatTŒ™ ";
+			msg << u8"Ê®°ÊùøÂèÇÊï∞floatT‰∏çÊòØÊµÆÁÇπÊï∞";
+			msg << u8"ÂÖ∂‰∏≠floatT‰∏∫ ";
 			msg << typeid(FloatT).name();
 			throw std::invalid_argument(msg.str());
 		}
@@ -50,6 +50,8 @@ public:
 	data_model_base()
 	{
 		check_type();
+		version = default_version;
+		comment = default_comment;
 		count = 0;
 	}
 	data_model_base(const data_model_base<FloatT>& d)
@@ -88,12 +90,16 @@ public:
 		json j;
 		try
 		{
-			input_file.open(path);
+			input_file.open(path, std::ifstream::in);
+			if(!input_file)
+			{
+				throw std::runtime_error(u8"Êñá‰ª∂‰∏çÂ≠òÂú®");
+			}
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"Œƒº˛¥Úø™ ß∞‹" << std::endl;
+			std::cerr << u8"Êñá‰ª∂ÊâìÂºÄÂ§±Ë¥•" << std::endl;
 			return;
 		}
 		try
@@ -104,7 +110,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"º”‘ÿJSON ß∞‹" << " " << path << std::endl;
+			std::cerr << u8"Âä†ËΩΩJSONÂ§±Ë¥•" << " " << path << std::endl;
 			return;
 		}
 		load_from_json(j);
@@ -115,12 +121,12 @@ public:
 		auto j = save_to_json();
 		try
 		{
-			output_file.open(path);
+			output_file.open(path, std::ofstream::out);
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"Œƒº˛¥Úø™ ß∞‹" << std::endl;
+			std::cerr << u8"Êñá‰ª∂ÊâìÂºÄÂ§±Ë¥•" << std::endl;
 			return;
 		}
 		try
@@ -131,16 +137,20 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"Œƒº˛–¥»Î ß∞‹" << " " << path << std::endl;
+			std::cerr << u8"Êñá‰ª∂ÂÜôÂÖ•Â§±Ë¥•" << " " << path << std::endl;
 		}
 	}
 	virtual void load_from_json(const json& j)
 	{
 		try
 		{
+			if(!j.count(_version()))
+			{
+				throw std::runtime_error(u8"version‰∏çÂ≠òÂú®");
+			}
 			version = j[_version()].get<string>();
 		}
-		catch (json::type_error &e)
+		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 			version = default_version;
@@ -148,9 +158,13 @@ public:
 		name = j[_name()].get<string>();
 		try
 		{
+			if (!j.count(_comment()))
+			{
+				throw std::runtime_error(u8"comment‰∏çÂ≠òÂú®");
+			}
 			comment = j[_comment()].get<string>();
 		}
-		catch (json::type_error &e)
+		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 			comment = default_comment;
@@ -167,7 +181,7 @@ public:
 		}
 		if(count!=data.size())
 		{
-			std::cerr << u8"Json÷–count”Î µº ≤ª∑˚" << std::endl;
+			std::cerr << u8"Json‰∏≠count‰∏éÂÆûÈôÖ‰∏çÁ¨¶" << std::endl;
 			count = data.size();
 		}
 		load_additional_data(j);

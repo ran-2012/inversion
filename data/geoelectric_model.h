@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "data_model_base.h"
 
@@ -31,6 +31,10 @@ class geoelectric_model :public data_model_base<FloatT>
 public:
 	FloatT layer_height;
 
+	geoelectric_model() :data_model_base<FloatT>()
+	{
+		
+	}
 	geoelectric_model(const geoelectric_model<FloatT>& g) :data_model_base<FloatT>(g)
 	{
 		layer_height = g.layer_height;

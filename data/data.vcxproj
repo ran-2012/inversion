@@ -80,6 +80,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>E:\Projects\include;C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\libs;$(LibraryPath)</LibraryPath>
+    <TargetExt>.pyd</TargetExt>
+    <TargetName>data_py</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>E:\Projects\include;C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\include;$(IncludePath)</IncludePath>
@@ -108,6 +110,9 @@
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>python36.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) C:\Users\ran\AppData\Local\conda\conda\envs\tensorflow\DLLs</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -142,7 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="data.cpp" />
+    <ClCompile Include="data_py.cpp" />
     <ClCompile Include="forward_data.h">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\Projects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\Projects\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -157,7 +162,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="data.h" />
+    <ClInclude Include="data_py.h" />
     <ClInclude Include="data_model_base.h" />
     <ClInclude Include="requirements.h" />
   </ItemGroup>

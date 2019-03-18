@@ -2,6 +2,7 @@
 
 #include <type_traits>
 #include <typeinfo>
+#include <ios>
 #include <iostream>
 #include <fstream>
 #include <sstream>
