@@ -5,13 +5,12 @@
 template<typename FloatT = float>
 class data_model_base
 {
-	using json=nlohmann::json;
-
+protected:
 	using string=std::string;
 	using pair=std::pair<FloatT,FloatT>;
 	using vector=std::vector<pair>;
-
 	using size_type=typename vector::size_type;
+	using json=nlohmann::json;
 
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
@@ -27,12 +26,81 @@ class data_model_base
 			throw std::invalid_argument(msg.str());
 		}
 	}
+	static void throw_critical_data_miss_exception(const string& data_name)
+	{
+		std::stringstream msg;
+		msg << u8"数据";
+		msg << data_name;
+		msg << u8"不存在";
+		throw std::runtime_error(msg.str());
+	}
+	static void ordinary_data_miss(const string& data_name)
+	{
+		std::stringstream msg;
+		msg << u8"数据";
+		msg << data_name;
+		msg << u8"不存在";
+		std::cerr << msg.str() << std::endl;
+	}
+
+	virtual void load_version(const json& j)
+	{
+		if(!j.count(_version()))
+		{
+			throw_critical_data_miss_exception(_version());
+		}
+		version = j[_version()].get<string>();
+	}
+	virtual void load_name(const json& j)
+	{
+		if(!j.count(_name()))
+		{
+			throw_critical_data_miss_exception(_name());
+		}
+		name = j[_name()].get<string>();
+	}
+	virtual void load_comment(const json& j)
+	{
+		if(!j.count(_comment()))
+		{
+			ordinary_data_miss(_comment());
+		}
+		comment = j[_comment()].get<string>();
+	}
+	virtual void load_count(const json& j)
+	{
+		if(!j.count(_count()))
+		{
+			throw_critical_data_miss_exception(_count());
+		}
+	}
+	virtual void load_data(const json& j)
+	{
+		if(!j.count(_data()))
+		{
+			throw_critical_data_miss_exception(_data());
+		}
+		data.clear();
+		json data_j = j[_data()];
+		for (auto& item : data_j)
+		{
+			auto first_data = item[_first_name()].get<FloatT>();
+			auto second_data = item[_second_name()].get<FloatT>();
+			data.emplace_back(first_data, second_data);
+		}
+		if (count != data.size())
+		{
+			std::cerr << u8"Json中count与实际不符" << std::endl;
+			count = data.size();
+		}
+	}
 
 	virtual string _version() { return string("version"); }
 	virtual string _name() { return string("name"); }
 	virtual string _comment() { return string("comment"); }
 	virtual string _count() { return string("count"); }
 	virtual string _data() { return string("data"); }
+
 	virtual string _first_name() { return string(""); };
 	virtual string _second_name() { return string(""); };
 
@@ -142,48 +210,12 @@ public:
 	}
 	virtual void load_from_json(const json& j)
 	{
-		try
-		{
-			if(!j.count(_version()))
-			{
-				throw std::runtime_error(u8"version不存在");
-			}
-			version = j[_version()].get<string>();
-		}
-		catch (std::exception &e)
-		{
-			std::cerr << e.what() << std::endl;
-			version = default_version;
-		}
-		name = j[_name()].get<string>();
-		try
-		{
-			if (!j.count(_comment()))
-			{
-				throw std::runtime_error(u8"comment不存在");
-			}
-			comment = j[_comment()].get<string>();
-		}
-		catch (std::exception &e)
-		{
-			std::cerr << e.what() << std::endl;
-			comment = default_comment;
-		}
-		count = j[_count()].get<size_type>();
+		load_version(j);
+		load_name(j);
+		load_comment(j);
+		load_count(j);
+		load_data(j);
 
-		data.clear();
-		json data_j = j[_data()];
-		for(auto& item : data_j)
-		{
-			auto first_data = item[_first_name()].get<FloatT>();
-			auto second_data = item[_second_name()].get<FloatT>();
-			data.emplace_back(first_data, second_data);
-		}
-		if(count!=data.size())
-		{
-			std::cerr << u8"Json中count与实际不符" << std::endl;
-			count = data.size();
-		}
 		load_additional_data(j);
 	}
 	virtual void save_to_json(json& j)

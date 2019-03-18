@@ -5,6 +5,7 @@
 template<typename FloatT>
 class geoelectric_model :public data_model_base<FloatT>
 {
+protected:
 	using json=nlohmann::json;
 
 	using string=std::string;
@@ -13,13 +14,24 @@ class geoelectric_model :public data_model_base<FloatT>
 
 	static constexpr char first_name[] = "number_of_layer";
 	static constexpr char second_name[] = "resistivity";
+
+	virtual void load_layer_height(const json& j)
+	{
+		if(!j.count(_layer_height()))
+		{
+			data_model_base<FloatT>::
+			throw_critical_data_miss_exception(_layer_height());
+		}
+		layer_height = j[_layer_height()].get<FloatT>();
+	}
+
 	string _first_name() override { return first_name;}
 	string _second_name() override { return second_name; }
 	virtual string _layer_height() { return string("layer_height"); }
 	
 	void load_additional_data(const json& j) override
 	{
-		layer_height = j[_layer_height()].get<FloatT>();
+		load_additional_data(j);
 	}
 	json save_additional_data() override
 	{
@@ -43,6 +55,7 @@ public:
 	{
 		layer_height = std::move(g.layer_height);
 	}
+	virtual ~geoelectric_model() = default;
 
 	geoelectric_model<FloatT>& operator=(const geoelectric_model<FloatT>& g)
 	{

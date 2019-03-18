@@ -23,6 +23,10 @@ class forward_data:public data_model_base<FloatT>
 	}
 public:
 
+	forward_data():data_model_base<FloatT>()
+	{
+		
+	}
 	forward_data(const forward_data<FloatT>& f):data_model_base<FloatT>(f)
 	{
 		
@@ -31,6 +35,7 @@ public:
 	{
 		
 	}
+	virtual ~forward_data() = default;
 
 	forward_data<FloatT>& operator=(const forward_data<FloatT>& f)
 	{

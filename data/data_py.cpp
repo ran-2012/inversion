@@ -17,7 +17,6 @@ PYBIND11_MODULE(data_py, m)
 	g.def_readwrite("name", &geoelectric_model::name);
 	g.def_readwrite("version", &geoelectric_model::version);
 	g.def_readwrite("comment", &geoelectric_model::comment);
-	g.def_readwrite("data", &geoelectric_model::data);
 	g.def_readwrite("count", &geoelectric_model::count);
 
 	g.def(py::init<>());
