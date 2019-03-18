@@ -31,7 +31,7 @@ protected:
 	
 	void load_additional_data(const json& j) override
 	{
-		load_additional_data(j);
+		load_layer_height(j);
 	}
 	json save_additional_data() override
 	{

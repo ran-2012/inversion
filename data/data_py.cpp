@@ -5,7 +5,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(data_py, m)
 {
-	m.doc() = u"正反演程序中所需的基本数据结构";
+	m.doc() = u8"正反演程序中所需的基本数据结构";
 	m.def("test_func", []() {return "hello world!"; });
 	using float_t=float;
 	//using float_t=double;
@@ -14,6 +14,7 @@ PYBIND11_MODULE(data_py, m)
 	using forward_data=forward_data<float_t>;
 
 	auto g=py::class_<geoelectric_model>(m, "geoelectric_model");
+	g.doc() = u8"地电模型";
 	g.def_readwrite("name", &geoelectric_model::name);
 	g.def_readwrite("version", &geoelectric_model::version);
 	g.def_readwrite("comment", &geoelectric_model::comment);
@@ -25,6 +26,7 @@ PYBIND11_MODULE(data_py, m)
 	g.def("save_to_file", &geoelectric_model::save_to_file);
 
 	auto f = py::class_<forward_data>(m, "forward_data");
+	f.doc() = u8"正演数据";
 	f.def(py::init<forward_data>());
 
 

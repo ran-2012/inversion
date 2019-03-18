@@ -47,7 +47,8 @@ protected:
 	{
 		if(!j.count(_version()))
 		{
-			throw_critical_data_miss_exception(_version());
+			ordinary_data_miss(_version());
+			return;
 		}
 		version = j[_version()].get<string>();
 	}
@@ -64,6 +65,7 @@ protected:
 		if(!j.count(_comment()))
 		{
 			ordinary_data_miss(_comment());
+			return;
 		}
 		comment = j[_comment()].get<string>();
 	}
@@ -241,6 +243,7 @@ public:
 		j[_data()] = std::move(data_j);
 
 		json patch_j = save_additional_data();
-		return j.patch(patch_j);
+		j.merge_patch(patch_j);
+		return j;
 	}
 };
