@@ -90,11 +90,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="forward_gpu.cu" />
-    <CudaCompile Include="kernel.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="forward_gpu.h" />
-    <ClInclude Include="requirements.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

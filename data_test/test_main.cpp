@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "../data/geoelectric_model.h"
+#include "../data/data.h"
 
 int main()
 {
@@ -12,6 +12,6 @@ int main()
 
 	geoelectric_model<float> g;
 	g.load_from_file("../data_load_test.json");
-	g.save_to_file(u8"../save_test.json");
+	g.save_to_file("../save_test.json");
 	return 0;
 }

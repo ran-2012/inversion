@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="requirements.h">
+    <ClInclude Include="forward_py.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="forward_py.h">
+    <ClInclude Include="forward.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

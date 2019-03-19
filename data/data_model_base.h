@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include "requirements.h"
 
@@ -20,8 +20,8 @@ protected:
 		if (!std::is_floating_point<FloatT>::value)
 		{
 			std::stringstream msg;
-			msg << u8"æ¨¡æ¿å‚æ•°floatTä¸æ˜¯æµ®ç‚¹æ•°";
-			msg << u8"å…¶ä¸­floatTä¸º ";
+			msg << "Ä£°å²ÎÊıfloatT²»ÊÇ¸¡µãÊı";
+			msg << "ÆäÖĞfloatTÎª ";
 			msg << typeid(FloatT).name();
 			throw std::invalid_argument(msg.str());
 		}
@@ -29,17 +29,17 @@ protected:
 	static void throw_critical_data_miss_exception(const string& data_name)
 	{
 		std::stringstream msg;
-		msg << u8"æ•°æ®";
+		msg << "Êı¾İ";
 		msg << data_name;
-		msg << u8"ä¸å­˜åœ¨";
+		msg << "²»´æÔÚ";
 		throw std::runtime_error(msg.str());
 	}
 	static void ordinary_data_miss(const string& data_name)
 	{
 		std::stringstream msg;
-		msg << u8"æ•°æ®";
+		msg << "Êı¾İ";
 		msg << data_name;
-		msg << u8"ä¸å­˜åœ¨";
+		msg << "²»´æÔÚ";
 		std::cerr << msg.str() << std::endl;
 	}
 
@@ -92,7 +92,7 @@ protected:
 		}
 		if (count != data.size())
 		{
-			std::cerr << u8"Jsonä¸­countä¸å®é™…ä¸ç¬¦" << std::endl;
+			std::cerr << "JsonÖĞcountÓëÊµ¼Ê²»·û" << std::endl;
 			count = data.size();
 		}
 	}
@@ -135,7 +135,7 @@ public:
 	}
 	virtual ~data_model_base() = default;
 
-	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
+	virtual data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
 	{
 		version = d.version;
 		name = d.name;
@@ -144,7 +144,7 @@ public:
 		data = d.data;
 		return *this;
 	}
-	data_model_base<FloatT>& operator=(data_model_base<FloatT>&& d) noexcept
+	virtual data_model_base<FloatT>& operator=(data_model_base<FloatT>&& d) noexcept
 	{
 		version = std::move(d.version);
 		name = std::move(d.name);
@@ -153,7 +153,19 @@ public:
 		data = std::move(d.data);
 		return *this;
 	}
+	virtual pair& operator[](size_type id)
+	{
+		return data[id];
+	}
+	virtual void set_item(size_type idx, const pair& p)
+	{
+		data[idx] = p;
+	}
 
+	virtual size_type size()
+	{
+		return data.size();
+	}
 	virtual void load_from_file(const string& path) final
 	{
 		std::ifstream input_file;
@@ -163,13 +175,13 @@ public:
 			input_file.open(path, std::ifstream::in);
 			if(!input_file)
 			{
-				throw std::runtime_error(u8"æ–‡ä»¶ä¸å­˜åœ¨");
+				throw std::runtime_error("ÎÄ¼ş²»´æÔÚ");
 			}
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"æ–‡ä»¶æ‰“å¼€å¤±è´¥" << std::endl;
+			std::cerr << "ÎÄ¼ş´ò¿ªÊ§°Ü" << std::endl;
 			return;
 		}
 		try
@@ -180,7 +192,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"åŠ è½½JSONå¤±è´¥" << " " << path << std::endl;
+			std::cerr << "¼ÓÔØJSONÊ§°Ü" << " " << path << std::endl;
 			return;
 		}
 		load_from_json(j);
@@ -196,7 +208,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"æ–‡ä»¶æ‰“å¼€å¤±è´¥" << std::endl;
+			std::cerr << "ÎÄ¼ş´ò¿ªÊ§°Ü" << std::endl;
 			return;
 		}
 		try
@@ -207,7 +219,7 @@ public:
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << u8"æ–‡ä»¶å†™å…¥å¤±è´¥" << " " << path << std::endl;
+			std::cerr << "ÎÄ¼şĞ´ÈëÊ§°Ü" << " " << path << std::endl;
 		}
 	}
 	virtual void load_from_json(const json& j)

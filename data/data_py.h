@@ -2,7 +2,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include "forward_data.h"
-#include "geoelectric_model.h"
+#include "data.h"
+#include "global.h"
 #include "requirements.h"
 
