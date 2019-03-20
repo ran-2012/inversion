@@ -11,6 +11,7 @@
 #include "../data/global.h"
 #include "../forward_gpu/forward_gpu.h"
 
+namespace py = pybind11;
 
 PYBIND11_MODULE(forward_py, m)
 {
