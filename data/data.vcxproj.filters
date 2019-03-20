@@ -20,13 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="requirements.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="data_model_base.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="data_py.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="global.h">

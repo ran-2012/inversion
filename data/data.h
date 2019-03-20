@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "data_model_base.h"
 
@@ -127,12 +127,12 @@ public:
 	using vector=std::vector<double>;
 	using string=std::string;
 
-	vector hkl_idx;
-	vector sin_idx;
-	vector cos_idx;
-	vector gs_idx;
+	vector hkl_coef;
+	vector sin_coef;
+	vector cos_coef;
+	vector gs_coef;
 
-	void load_idx_from_file(const string& path, vector& v)
+	static void load_coef_from_file(const string& path, vector& v)
 	{
 		std::ifstream input_file;
 		try
@@ -140,7 +140,7 @@ public:
 			input_file.open(path, std::ifstream::in);
 			if (!input_file)
 			{
-				throw std::runtime_error(path + u8"´ò¿ªÊ§°Ü");
+				throw std::runtime_error(string("file ") + path + string(" do not exist"));
 			}
 		}
 		catch (std::exception & e)
@@ -161,19 +161,19 @@ public:
 	}
 	void load_hkl_coef(const string & path)
 	{
-		load_idx_from_file(path, hkl_idx);
+		load_coef_from_file(path, hkl_coef);
 	}
 	void load_sin_coef(const string & path)
 	{
-		load_idx_from_file(path, sin_idx);
+		load_coef_from_file(path, sin_coef);
 	}
 	void load_cos_coef(const string & path)
 	{
-		load_idx_from_file(path, cos_idx);
+		load_coef_from_file(path, cos_coef);
 	}
 	void load_gs_coef(const string & path)
 	{
-		load_idx_from_file(path, gs_idx);
+		load_coef_from_file(path, gs_coef);
 	}
 
 };

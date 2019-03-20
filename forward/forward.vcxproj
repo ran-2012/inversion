@@ -169,7 +169,6 @@
     <ClCompile Include="forward_py.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="forward_py.h" />
     <ClInclude Include="forward.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

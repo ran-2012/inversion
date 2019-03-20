@@ -1,5 +1,8 @@
+ï»¿
+#include <pybind11/pybind11.h>
 
-#include "data_py.h"
+#include "data.h"
+#include "global.h"
 
 namespace py = pybind11;
 
@@ -7,14 +10,14 @@ static global g;
 
 PYBIND11_MODULE(data_py, m)
 {
-	m.doc() = "Õı·´Ñİ³ÌĞòÖĞËùĞèµÄ»ù±¾Êı¾İ½á¹¹¼°È«¾ÖÊı¾İ";
-	m.def("test_func", []() {return "hello world!"; }, "²âÊÔº¯Êı");
+	m.doc() = u8"æ­£åæ¼”ç¨‹åºä¸­æ‰€éœ€çš„åŸºæœ¬æ•°æ®ç»“æ„åŠå…¨å±€æ•°æ®";
+	m.def("test_func", []() {return "hello world!"; }, u8"æµ‹è¯•å‡½æ•°");
 	using float_t=float;
 	using geoelectric_model=geoelectric_model<float_t>;
 	using forward_data=forward_data<float_t>;
 
 	auto g=py::class_<geoelectric_model>(m, "geoelectric_model");
-	g.doc() = "µØµçÄ£ĞÍ";
+	g.doc() = u8"åœ°ç”µæ¨¡å‹";
 	g.def_readwrite("name", &geoelectric_model::name);
 	g.def_readwrite("version", &geoelectric_model::version);
 	g.def_readwrite("comment", &geoelectric_model::comment);
@@ -28,7 +31,7 @@ PYBIND11_MODULE(data_py, m)
 	g.def("save_to_file", &geoelectric_model::save_to_file);
 
 	auto f = py::class_<forward_data>(m, "forward_data");
-	f.doc() = "ÕıÑİÊı¾İ";
+	f.doc() = u8"æ­£æ¼”æ•°æ®";
 	f.def(py::init<forward_data>());
 
 	auto c = py::class_<filter_coefficient>(m, "filter_coefficient");
@@ -36,7 +39,6 @@ PYBIND11_MODULE(data_py, m)
 	c.def("load_sin_coef", &filter_coefficient::load_sin_coef);
 	c.def("load_cos_coef", &filter_coefficient::load_cos_coef);
 	c.def("load_gs_coef", &filter_coefficient::load_gs_coef);
-
 
 }
 
