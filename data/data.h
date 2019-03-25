@@ -2,16 +2,18 @@
 
 #include "data_model_base.h"
 
-template<typename FloatT = float>
+template<typename FloatT = global::float_t>
 class forward_data :public data_model_base<FloatT>
 {
 	using string=std::string;
 	using json=nlohmann::json;
+	using size_type=typename data_model_base<FloatT>::size_type;
 
 	static constexpr char first_name[] = "time";
 	static constexpr char second_name[] = "response";
-	string _first_name() override { return first_name; }
-	string _second_name() override { return second_name; }
+
+	std::vector<string> _data_content_name() override { return { first_name, second_name }; }
+
 	void load_additional_data(const json& j) override
 	{
 
@@ -40,29 +42,81 @@ public:
 
 	forward_data<FloatT>& operator=(const forward_data<FloatT>& f)
 	{
-		*this = data_model_base<FloatT>::operator=(f);
+		this->data_model_base<FloatT>::operator=(f);
 
 		return *this;
 	}
 	forward_data<FloatT>& operator=(forward_data<FloatT>&& f)noexcept
 	{
-		*this = data_model_base<FloatT>::operator=(std::move(f));
+		this->data_model_base<FloatT>::operator=(std::move(f));
 
 		return *this;
 	}
 };
 
-template<typename FloatT = float>
+template<typename FloatT = global::float_t>
 class geoelectric_model :public data_model_base<FloatT>
+{
+	using string=std::string;
+	using json=nlohmann::json;
+	using size_type=typename data_model_base<FloatT>::size_type;
+
+	static constexpr char first_name[] = "idx";
+	static constexpr char second_name[] = "height";
+	static constexpr char third_name[] = "resistivity";
+
+	std::vector<string> _data_content_name() override { return { first_name, second_name, third_name }; }
+
+	void load_additional_data(const json& j) override
+	{
+
+	}
+	json save_additional_data() override
+	{
+		json patch_j;
+		return patch_j;
+	}
+
+public:
+
+	geoelectric_model() :data_model_base<FloatT>()
+	{
+
+	}
+	geoelectric_model(const geoelectric_model<FloatT>& f) :data_model_base<FloatT>(f)
+	{
+
+	}
+	geoelectric_model(geoelectric_model<FloatT>&& f)noexcept :data_model_base<FloatT>(std::move(f))
+	{
+
+	}
+	virtual ~geoelectric_model() = default;
+
+	geoelectric_model<FloatT>& operator=(const geoelectric_model<FloatT>& f)
+	{
+		this->data_model_base<FloatT>::operator=(f);
+
+		return *this;
+	}
+	geoelectric_model<FloatT>& operator=(geoelectric_model<FloatT>&& f)noexcept
+	{
+		this->data_model_base<FloatT>::operator=(std::move(f));
+
+		return *this;
+	}
+};
+
+template<typename FloatT = global::float_t>
+class isometric_model :public data_model_base<FloatT>
 {
 protected:
 	using json=nlohmann::json;
-
 	using string=std::string;
 	using pair=std::pair<FloatT, FloatT>;
-	using vector=std::vector<pair>;
+	using size_type=typename data_model_base<FloatT>::size_type;
 
-	static constexpr char first_name[] = "number_of_layer";
+	static constexpr char first_name[] = "idx";
 	static constexpr char second_name[] = "resistivity";
 
 	virtual void load_layer_height(const json& j)
@@ -75,8 +129,7 @@ protected:
 		layer_height = j[_layer_height()].get<FloatT>();
 	}
 
-	string _first_name() override { return first_name; }
-	string _second_name() override { return second_name; }
+	std::vector<string> _data_content_name() override { return { first_name, second_name }; }
 	virtual string _layer_height() { return string("layer_height"); }
 
 	void load_additional_data(const json& j) override
@@ -93,44 +146,62 @@ protected:
 public:
 	FloatT layer_height;
 
-	geoelectric_model() :data_model_base<FloatT>()
+	isometric_model() :data_model_base<FloatT>()
 	{
 		layer_height = 0;
 	}
-	geoelectric_model(const geoelectric_model<FloatT>& g) :data_model_base<FloatT>(g)
+	isometric_model(const isometric_model<FloatT>& g) :data_model_base<FloatT>(g)
 	{
 		layer_height = g.layer_height;
 	}
-	geoelectric_model(geoelectric_model<FloatT>&& g)noexcept :data_model_base<FloatT>(std::move(g))
+	isometric_model(isometric_model<FloatT>&& g)noexcept :data_model_base<FloatT>(std::move(g))
 	{
 		layer_height = std::move(g.layer_height);
 	}
-	virtual ~geoelectric_model() = default;
+	virtual ~isometric_model() = default;
 
-	geoelectric_model<FloatT>& operator=(const geoelectric_model<FloatT>& g)
+	isometric_model<FloatT>& operator=(const isometric_model<FloatT>& g)
 	{
-		*this = data_model_base<FloatT>::operator=(g);
+		this->data_model_base<FloatT>::operator=(g);
 		layer_height = g.layer_height;
 		return *this;
 	}
-	geoelectric_model<FloatT>& operator=(geoelectric_model<FloatT>&& g) noexcept
+	isometric_model<FloatT>& operator=(isometric_model<FloatT>&& g) noexcept
 	{
-		*this = data_model_base<FloatT>::operator=(std::move(g));
+		this->data_model_base<FloatT>::operator=(std::move(g));
 		layer_height = std::move(g.layer_height);
 		return *this;
 	}
 };
 
+template<typename FloatT = global::float_t>
 class filter_coefficient
 {
 public:
-	using vector=std::vector<double>;
+	using vector=std::vector<FloatT>;
 	using string=std::string;
 
 	vector hkl_coef;
 	vector sin_coef;
 	vector cos_coef;
 	vector gs_coef;
+
+	filter_coefficient() = default;
+	filter_coefficient(const filter_coefficient<FloatT>& coef)
+	{
+		*this = coef;
+	}
+	~filter_coefficient() = default;
+
+	filter_coefficient<FloatT>& operator=(const filter_coefficient<FloatT>& coef)
+	{
+		hkl_coef = coef.hkl_coef;
+		sin_coef = coef.sin_coef;
+		cos_coef = coef.cos_coef;
+		gs_coef = coef.gs_coef;
+
+		return *this;
+	}
 
 	static void load_coef_from_file(const string& path, vector& v)
 	{
@@ -154,7 +225,7 @@ public:
 		v.clear();
 		while (n--)
 		{
-			double idx;
+			FloatT idx;
 			input_file >> idx;
 			v.emplace_back(idx);
 		}

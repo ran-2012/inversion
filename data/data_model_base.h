@@ -13,19 +13,22 @@
 
 #include <nlohmann/json.hpp>
 
-template<typename FloatT = float>
+#include "global.h"
+
+//地电模型与正演结果基类
+template<typename FloatT = global::float_t>
 class data_model_base
 {
 protected:
 	using string=std::string;
-	using pair=std::pair<FloatT,FloatT>;
-	using vector=std::vector<pair>;
+	using vector=std::vector<FloatT>;
 	using size_type=typename vector::size_type;
 	using json=nlohmann::json;
 
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
 
+	//检查模板参数是否为浮点类型
 	void check_type()
 	{
 		if (!std::is_floating_point<FloatT>::value)
@@ -59,6 +62,7 @@ protected:
 		if(!j.count(_version()))
 		{
 			ordinary_data_miss(_version());
+			version = default_version;
 			return;
 		}
 		version = j[_version()].get<string>();
@@ -76,6 +80,7 @@ protected:
 		if(!j.count(_comment()))
 		{
 			ordinary_data_miss(_comment());
+			comment = default_comment;
 			return;
 		}
 		comment = j[_comment()].get<string>();
@@ -86,6 +91,7 @@ protected:
 		{
 			throw_critical_data_miss_exception(_count());
 		}
+		count = j[_count()].get<size_type>();
 	}
 	virtual void load_data(const json& j)
 	{
@@ -93,18 +99,22 @@ protected:
 		{
 			throw_critical_data_miss_exception(_data());
 		}
-		data.clear();
 		json data_j = j[_data()];
+		auto data_names = _data_content_name();
+		data.clear();
+		data.resize(_data_content_count());
 		for (auto& item : data_j)
 		{
-			auto first_data = item[_first_name()].get<FloatT>();
-			auto second_data = item[_second_name()].get<FloatT>();
-			data.emplace_back(first_data, second_data);
+			for(size_type i=0; i < _data_content_count(); ++i)
+			{
+				auto temp = item[data_names[i]].get<FloatT>();
+				data[i].push_back(temp);
+			}
 		}
-		if (count != data.size())
+		if (count != data[0].size())
 		{
 			std::cerr << "JSON中的count与实际数据不符" << std::endl;
-			count = data.size();
+			count = data[0].size();
 		}
 	}
 
@@ -114,8 +124,8 @@ protected:
 	virtual string _count() { return string("count"); }
 	virtual string _data() { return string("data"); }
 
-	virtual string _first_name() { return string(""); };
-	virtual string _second_name() { return string(""); };
+	virtual size_type _data_content_count() { return _data_content_name().size(); }
+	virtual std::vector<string> _data_content_name() { return { "" }; }
 
 	virtual void load_additional_data(const json& j) {}
 	virtual json save_additional_data() { return json(); }
@@ -126,7 +136,7 @@ public:
 	string comment;
 
 	size_type count;
-	vector data;
+	std::vector<vector> data;
 
 	data_model_base()
 	{
@@ -146,6 +156,10 @@ public:
 	}
 	virtual ~data_model_base() = default;
 
+	string get_content_name(size_type idx)
+	{
+		return _data_content_name()[idx];
+	}
 	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
 	{
 		version = d.version;
@@ -164,11 +178,11 @@ public:
 		data = std::move(d.data);
 		return *this;
 	}
-	virtual pair& operator[](size_type id)
+	virtual vector& operator[](size_type id)
 	{
 		return data[id];
 	}
-	virtual void set_item(size_type idx, const pair& p)
+	virtual void set_item(size_type idx, const vector& p)
 	{
 		data[idx] = p;
 	}
@@ -260,11 +274,14 @@ public:
 		j[_count()] = count;
 
 		json data_j;
-		for(auto it=data.begin();it!=data.end();++it)
+		auto names = _data_content_name();
+		for(size_type idx=0; idx < data[0].size(); ++idx)
 		{
 			json unit_j;
-			unit_j[_first_name()] = it->first;
-			unit_j[_second_name()] = it->second;
+			for(size_type i=0; i<_data_content_count(); ++i)
+			{
+				unit_j[names[i]] = data[i][idx];
+			}
 			data_j.emplace_back(unit_j);
 		}
 		j[_data()] = std::move(data_j);

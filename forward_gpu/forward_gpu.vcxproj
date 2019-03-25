@@ -63,7 +63,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <Include>E:\Projects\include;%(Include)</Include>
+      <Include>E:\Projects\include;D:\CUDA\CUDA Samples\v10.1\common\inc;%(Include)</Include>
       <AdditionalDeps>%(AdditionalDeps)</AdditionalDeps>
     </CudaCompile>
   </ItemDefinitionGroup>

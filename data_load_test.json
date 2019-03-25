@@ -3,11 +3,11 @@
   "comment": "this is test data",
   "data": [
     {
-      "number_of_layer": 1,
+      "idx": 1,
       "resistivity": 100
     },
     {
-      "number_of_layer": 2,
+      "idx": 2,
       "resistivity": 200
     }
   ],
