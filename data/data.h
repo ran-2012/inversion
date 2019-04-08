@@ -247,4 +247,8 @@ public:
 		load_coef_from_file(path, gs_coef);
 	}
 
+	bool is_valid()
+	{
+		return hkl_coef.empty()||sin_coef.empty()||cos_coef.empty()||gs_coef.empty();
+	}
 };

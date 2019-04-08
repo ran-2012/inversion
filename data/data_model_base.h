@@ -184,6 +184,10 @@ public:
 	}
 	virtual void set_item(size_type idx, const vector& p)
 	{
+		if (idx >= data.size())
+		{
+			throw(std::runtime_error("idx超过data的数据范围"))
+		}
 		data[idx] = p;
 	}
 
