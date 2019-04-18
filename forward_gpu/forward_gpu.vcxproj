@@ -92,6 +92,7 @@
     <CudaCompile Include="forward_gpu.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="device_ptr.h" />
     <ClInclude Include="forward_gpu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

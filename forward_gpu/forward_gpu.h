@@ -18,6 +18,8 @@ public:
 	using forward_data=forward_data<float_t>;
 	using filter_coefficient=filter_coefficient<float_t>;
 
+	constexpr static float_t threshold = 1e-5;
+
 protected:
 	filter_coefficient f;
 	geoelectric_model g;
