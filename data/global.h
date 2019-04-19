@@ -1,27 +1,41 @@
 ﻿#pragma once
 
-#if defined(_MSC_VER) && defined(_WIN64)
+#if defined(_MSC_VER)
 #include <atlbase.h>
+#elif
+#include <iostream>
+#endif
+
+#include <ctime>
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <chrono>
+
 namespace global
 {
-	void log(const std::string& tag, const std::string& conetent)
+	decltype(auto) current_time()
+	{
+		auto now = std::chrono::system_clock::now();
+		auto now_c = std::chrono::system_clock::to_time_t(now);
+		return std::put_time(localtime(&now_c), "%Y-%m-%d %H:%M:%S");
+	}
+
+	template<typename T, typename U>
+	void log(const T& tag, const U& content)
 	{
 		//输出日志到VS输出窗口
-		std::string msg;
-		msg = tag + " | " + content + '\n';
-		OutputDebugString(msg.c_str());
-	}
-}
+		std::stringstream msg;
+		msg << current_time() << "\t";
+		msg << tag << " | " << content << "\n";
+#if defined(_MSC_VER)
+		OutputDebugString(msg.str().c_str());
 #elif
-namespace global
-{
-	void log(const std::string& tag, const std::string& content)
-	{
-		// stub
+		std::clog << msg.str()<<std::flush();
+#endif
 	}
 }
-#endif
+
 
 namespace global
 {
