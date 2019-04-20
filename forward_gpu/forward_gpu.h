@@ -6,7 +6,7 @@
 #include <exception>
 
 #include "../data/data.h"
-#include "../data/global.h"
+#include "../global/global.h"
 
 class forward_base
 {

@@ -1,8 +1,8 @@
-
+﻿
 #include <pybind11/pybind11.h>
 
 #include "data.h"
-#include "global.h"
+#include "../global/global.h"
 
 namespace py = pybind11;
 
@@ -20,7 +20,7 @@ PYBIND11_MODULE(data_py, m)
 	using filter_coefficient=filter_coefficient<float_t>;
 
 	//data_model_base
-	auto b=py::class_<data_model_base>(m, "data_model_base");
+	auto b = py::class_<data_model_base>(m, "data_model_base");
 	b.doc() = "数据模型基类";
 	b.def_readwrite("name", &data_model_base::name);
 	b.def_readwrite("version", &data_model_base::version);
@@ -67,3 +67,5 @@ PYBIND11_MODULE(data_py, m)
 	c.def("load_gs_coef", &filter_coefficient::load_gs_coef);
 
 }
+
+

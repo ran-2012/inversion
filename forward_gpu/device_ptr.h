@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cmath>
 #include <cassert>
@@ -8,9 +8,9 @@
 
 #include <cuda_runtime.h>
 
-#include "../data/global.h"
+#include "../global/global.h"
 
-//deviceÊý¾ÝÖÇÄÜÖ¸Õë£¬×Ô¶¯ÊÍ·ÅÏÔ´æ
+//deviceæ•°æ®æ™ºèƒ½æŒ‡é’ˆï¼Œè‡ªåŠ¨é‡Šæ”¾æ˜¾å­˜
 class device_ptr
 {
 public:
@@ -22,9 +22,9 @@ private:
 public:
 	device_ptr() { device_mem = nullptr; }
 	device_ptr(const device_ptr& p) = delete;
-	device_ptr(device_ptr&& p)
+	device_ptr(device_ptr&& p) noexcept :device_mem(p.device_mem)
 	{
-		*this = std::move(p);
+		p.device_mem = nullptr;
 	}
 
 	~device_ptr()
@@ -32,11 +32,12 @@ public:
 		release();
 	}
 
-	device_ptr operator=(device_ptr&& p)
+	device_ptr& operator=(device_ptr&& p) noexcept
 	{
 		this->release();
 		device_mem = p.get();
 		p.release();
+		return *this;
 	}
 
 	void allocate(size_t size)
@@ -50,10 +51,8 @@ public:
 	}
 	void release() noexcept
 	{
-		if (device_mem)
-		{
-			cudaFree(device_mem);
-			device_mem = nullptr;
-		}
+		assert(device_mem);
+		cudaFree(device_mem);
+		device_mem = nullptr;
 	}
 };

@@ -9,7 +9,7 @@
 #include "forward_gpu.h"
 #include "device_ptr.h"
 #include "../data/data.h"
-#include "../data/global.h"
+#include "../global/global.h"
 
 //cuda错误代码检查
 #define CHECK_CUDA_ERROR(err)\

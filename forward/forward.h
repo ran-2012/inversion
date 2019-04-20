@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <pybind11/pybind11.h>
 
@@ -9,5 +9,5 @@
 #include <algorithm>
 
 #include "../data/data.h"
-#include "../data/global.h"
+#include "../global/global.h"
 #include "../forward_gpu/forward_gpu.h"

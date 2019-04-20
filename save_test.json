@@ -3,11 +3,11 @@
     "count": 2,
     "data": [
         {
-            "number_of_layer": 1.0,
+            "idx": 1.0,
             "resistivity": 100.0
         },
         {
-            "number_of_layer": 2.0,
+            "idx": 2.0,
             "resistivity": 200.0
         }
     ],
