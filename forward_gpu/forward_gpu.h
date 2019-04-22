@@ -38,7 +38,7 @@ public:
 
 	virtual ~forward_base() = default;
 
-	virtual void bind_filter_coef(const filter_coefficient& coef) final
+	virtual void load_filter_coef(const filter_coefficient& coef) final
 	{
 		f = coef;
 	}
@@ -62,8 +62,8 @@ public:
 	forward_gpu() = default;
 	~forward_gpu() = default;
 
-	void init_cuda_device();
-	void test_cuda_device();
+	static void init_cuda_device();
+	static void test_cuda_device();
 
 	forward_data forward()override;
 };

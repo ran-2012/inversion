@@ -8,14 +8,12 @@
 
 #include <cuda_runtime.h>
 
+#include "cuda_helper.h"
 #include "../global/global.h"
 
 //device数据智能指针，自动释放显存
 class device_ptr
 {
-public:
-	using float_t = global::float_t;
-
 private:
 	float_t *device_mem;
 
@@ -42,8 +40,8 @@ public:
 
 	void allocate(size_t size)
 	{
-		assert(!device_mem);
-		cudaMalloc(&device_mem, size * sizeof(float_t));
+		auto err = cudaMalloc(&device_mem, size * sizeof(float_t));
+		CHECK;
 	}
 	float_t* get()
 	{
@@ -51,8 +49,12 @@ public:
 	}
 	void release() noexcept
 	{
-		assert(device_mem);
-		cudaFree(device_mem);
+		if (!device_mem)
+		{
+			return;
+		}
+		auto err = cudaFree(device_mem);
+		CHECK;
 		device_mem = nullptr;
 	}
 };

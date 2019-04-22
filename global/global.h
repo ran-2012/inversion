@@ -8,6 +8,7 @@ namespace global
 	namespace detail
 	{
 		void _log(const std::string& tag, const std::string& content);
+		class _scoped_timer;
 	}
 	std::string current_time();
 
@@ -20,6 +21,15 @@ namespace global
 		content_s << content;
 		detail::_log(tag_s.str(), content_s.str());
 	}
+
+	//作用域计时器，退出作用域时输出时间
+	class scoped_timer
+	{
+	private:
+		detail::_scoped_timer timer;
+	public :
+		scoped_timer(std::string name) :timer(name) {}
+	};
 }
 
 
