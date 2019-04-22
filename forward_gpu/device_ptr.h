@@ -14,10 +14,10 @@
 class device_ptr
 {
 public:
-	using floatd_t = global::float_t;
+	using float_t = global::float_t;
 
 private:
-	floatd_t *device_mem;
+	float_t *device_mem;
 
 public:
 	device_ptr() { device_mem = nullptr; }
@@ -42,9 +42,9 @@ public:
 	void allocate(size_t size)
 	{
 		assert(!device_mem);
-		cudaMalloc(&device_mem, size * sizeof(floatd_t));
+		cudaMalloc(&device_mem, size * sizeof(float_t));
 	}
-	floatd_t* get()
+	float_t* get()
 	{
 		return device_mem;
 	}

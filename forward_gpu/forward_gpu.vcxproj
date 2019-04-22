@@ -92,6 +92,8 @@
     <CudaCompile Include="forward_gpu.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cuda_helper.h" />
+    <ClInclude Include="device_array.h" />
     <ClInclude Include="device_ptr.h" />
     <ClInclude Include="forward_gpu.h" />
   </ItemGroup>

@@ -1,6 +1,5 @@
 ﻿
 #include <cmath>
-#include <sstream>
 #include <memory>
 #include <exception>
 
@@ -8,39 +7,9 @@
 
 #include "forward_gpu.h"
 #include "device_ptr.h"
+#include "cuda_helper.h"
 #include "../data/data.h"
 #include "../data/global.h"
-
-//cuda错误代码检查
-#define CHECK_CUDA_ERROR(err)\
-	if(err!=cudaSuccess)\
-	{\
-		std::stringstream msg;\
-		msg << "cuda error: \n";\
-		msg << cudaGetErrorName(err) << '\n';\
-		msg << "at line: " << __LINE__;\
-		throw std::runtime_error(msg.str());\
-	}
-//对err进行错误检查，需定义err为cudaError_t
-#define CHECK CHECK_CUDA_ERROR(err)
-//复制host内存内容到device中
-void copy_to_device(void* host, void* device, size_t size)
-{
-	auto err = cudaMemcpy(device, host, size, cudaMemcpyHostToDevice);
-	CHECK
-}
-//复制device显存内容到host中
-void copy_to_host(void* device, const void* host, size_t size)
-{
-	auto err = cudaMemcpy(device, host, size, cudaMemcpyDeviceToHost);
-	CHECK
-}
-
-//host中的数据
-using floath_t=global::float_t;
-using floath_ptr=std::unique_ptr<floath_t[]>;
-//device中的数据
-using floatd_t=global::float_t;
 
 void forward_gpu::init_cuda_device()
 {
@@ -50,7 +19,7 @@ void forward_gpu::init_cuda_device()
 	global::log("forward", "init_cuda_device complete");
 }
 
-__global__ void test_device_kernel(floatd_t *a, floatd_t *b, floatd_t *c, int num)
+__global__ void test_device_kernel(float_t *a, float_t *b, float_t *c, int num)
 {
 	int i = threadIdx.x;
 	if (i >= num)
@@ -60,17 +29,25 @@ __global__ void test_device_kernel(floatd_t *a, floatd_t *b, floatd_t *c, int nu
 	c[i] = a[i] * b[i];
 }
 
+__global__ void hankel_transform(float_t a, float_t i0,
+	float_t* hankel, float_t hankel_len,
+	float_t* resistence, float_t res_len,
+	floatd_*,)
+{
+
+}
+
 void forward_gpu::test_cuda_device()
 {
 	device_ptr da;
 	device_ptr db;
 	device_ptr dc;
 
-	floath_t a[] = { 1,2,3,4,5 };
-	floath_t b[] = { 1,2,3,4,5 };
+	float_t a[] = { 1,2,3,4,5 };
+	float_t b[] = { 1,2,3,4,5 };
 
-	auto size = sizeof(a) / sizeof(floath_t);
-	floath_ptr c(new floath_t[size]);
+	auto size = sizeof(a) / sizeof(float_t);
+	floath_ptr c(new float_t[size]);
 
 	da.allocate(size);
 	db.allocate(size);
