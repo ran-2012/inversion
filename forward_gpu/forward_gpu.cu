@@ -9,7 +9,7 @@
 #include "device_ptr.h"
 #include "cuda_helper.h"
 #include "../data/data.h"
-#include "../data/global.h"
+#include "../global/global.h"
 
 void forward_gpu::init_cuda_device()
 {

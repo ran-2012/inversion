@@ -1,4 +1,4 @@
-
+ï»¿
 #include <pybind11/pybind11.h>
 
 #include <vector>
@@ -8,14 +8,14 @@
 #include <algorithm>
 
 #include "../data/data.h"
-#include "../data/global.h"
+#include "../global/global.h"
 #include "../forward_gpu/forward_gpu.h"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(forward_py, m)
 {
-	m.doc() = "ÕıÑİÄ£¿é";
+	m.doc() = "æ­£æ¼”æ¨¡å—";
 
 
 }
