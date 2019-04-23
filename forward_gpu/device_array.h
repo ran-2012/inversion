@@ -16,8 +16,18 @@
 class device_array
 {
 private:
-	device_ptr device_mem;
+	device_ptr<float_t> device_mem;
 	size_t device_mem_size;
+
+	//在显存中的this
+	device_ptr<device_array> device_this_ptr;
+
+	__host__ void allocate_device_this_ptr()
+	{
+		device_this_ptr.release();
+		device_this_ptr.allocate(1);
+		copy_to_device(this, device_this_ptr.get(), 1);
+	}
 
 public:
 	device_array() :device_mem_size(0)
@@ -29,6 +39,13 @@ public:
 	{
 		device_mem.allocate(vec.size());
 		copy_to_device(vec.data(), device_mem.get(), device_mem_size);
+
+		allocate_device_this_ptr();
+	}
+
+	__host__ device_array* get_device_ptr()
+	{
+		return device_this_ptr.get();
 	}
 
 	__host__ void load_data(const std::vector<float_t> &vec)
@@ -46,10 +63,16 @@ public:
 		copy_to_host(device_mem.get(), host_mem.get(), device_mem_size);
 
 		vec.clear();
+		vec.resize(size());
 		for (auto i = 0; i < device_mem_size; ++i)
 		{
-			vec.push_back(host_mem.get()[i]);
+			vec[i] = host_mem.get()[i];
 		}
+	}
+	//访问数据指针，仅kernel中可访问
+	__device__ float_t* get()
+	{
+		return device_mem.get();
 	}
 	//访问数据，仅kernel中可访问
 	__device__ float_t& operator[](size_t idx)

@@ -12,6 +12,7 @@
 #include "../global/global.h"
 
 //device数据智能指针，自动释放显存
+template<typename T = float_t>
 class device_ptr
 {
 private:
@@ -40,10 +41,10 @@ public:
 
 	void allocate(size_t size)
 	{
-		auto err = cudaMalloc(&device_mem, size * sizeof(float_t));
+		auto err = cudaMalloc(&device_mem, size * sizeof(T));
 		CHECK;
 	}
-	float_t* get()
+	__host__ __device__ T* get()
 	{
 		return device_mem;
 	}
