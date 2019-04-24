@@ -20,8 +20,8 @@ private:
 
 public:
 	device_ptr() { device_mem = nullptr; }
-	device_ptr(const device_ptr& p) = delete;
-	device_ptr(device_ptr&& p) noexcept :device_mem(p.device_mem)
+	device_ptr(const device_ptr<T>& p) = delete;
+	device_ptr(device_ptr<T>&& p) noexcept :device_mem(p.device_mem)
 	{
 		p.device_mem = nullptr;
 	}
@@ -31,7 +31,7 @@ public:
 		release();
 	}
 
-	device_ptr& operator=(device_ptr&& p) noexcept
+	device_ptr<T>& operator=(device_ptr<T>&& p) noexcept
 	{
 		this->release();
 		device_mem = p.get();

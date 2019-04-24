@@ -3,7 +3,7 @@
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #include <atlbase.h>
-#elif
+#else
 #include <iostream>
 #endif
 
@@ -24,8 +24,8 @@ namespace global
 			msg << tag << " | " << content << "\n";
 #if defined(_MSC_VER) && defined(_DEBUG)
 			OutputDebugString(msg.str().c_str());
-#elif
-			std::clog << msg.str() << std::flush();
+#else
+			std::clog << msg.str() << std::flush;
 #endif
 		}
 
