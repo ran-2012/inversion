@@ -33,7 +33,7 @@ __global__ void test_device_kernel(float_t *a, float_t *b, float_t *c, int num)
 	c[i] = a[i] * b[i];
 }
 
-__host__ complex return_dHz_w(float_t a, float_t i0, float_t h,
+__host__ thrust::complex<float_t> return_dHz_w(float_t a, float_t i0, float_t h,
 	device_array *hankel,
 	device_array *resistence,
 	device_array *height,
@@ -41,6 +41,17 @@ __host__ complex return_dHz_w(float_t a, float_t i0, float_t h,
 {
 	constexpr float_t a1 = -7.91001919000e+00;
 	constexpr float_t s1 = 8.79671439570e-02;
+
+	thrust::complex<float_t> ret(0, 0);
+
+	const float_t* hankel_ptr = hankel->get();
+	const int hankel_size = hankel->size();
+	for (int k = 0; k < hankel_size; ++k)
+	{
+		const thrust::complex<float_t> i(0, 1);
+		const float_t lmd = 1 / a * pow(10, a1 + (k*s1));
+		const thrust::complex<float_t> u1 = sqrt(pow(lmd, 2) - i * w*mu0 / res(0));
+	}
 }
 
 //计算正演kernel函数
@@ -90,7 +101,7 @@ __global__ void forward_kernel(float_t a, float_t i0, float_t h,
 	//二分求和
 	for (int offset = time_num / 2; offset > 0; offset >>= 1)
 	{
-		if (threadIdx.x < offset)
+		if (time_idx < offset)
 		{
 			res_complex[time_idx] += res_complex[time_idx + offset];
 		}
