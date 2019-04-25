@@ -160,6 +160,10 @@ public:
 	{
 		return _data_content_name()[idx];
 	}
+	virtual size_type get_name_idx(const string& name)
+	{
+		return 0;
+	}
 	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
 	{
 		version = d.version;
@@ -181,6 +185,10 @@ public:
 	virtual vector& operator[](size_type id)
 	{
 		return data[id];
+	}
+	virtual vector& operator[](const string& name)
+	{
+		return data[get_name_idx(name)];
 	}
 	virtual void set_item(size_type idx, const vector& p)
 	{

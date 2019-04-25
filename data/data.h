@@ -40,6 +40,13 @@ public:
 	}
 	virtual ~forward_data() = default;
 
+	size_type get_name_idx(const string& name) override
+	{
+		if (name == string(first_name))
+			return 0;
+		if (name == string(second_name))
+			return 1;
+	}
 	forward_data<FloatT>& operator=(const forward_data<FloatT>& f)
 	{
 		this->data_model_base<FloatT>::operator=(f);
@@ -92,6 +99,16 @@ public:
 
 	}
 	virtual ~geoelectric_model() = default;
+
+	size_type get_name_idx(const string& name) override
+	{
+		if (name == string(first_name))
+			return 0;
+		if (name == string(second_name))
+			return 1;
+		if (name == string(third_name))
+			return 2;
+	}
 
 	geoelectric_model<FloatT>& operator=(const geoelectric_model<FloatT>& f)
 	{
@@ -159,6 +176,16 @@ public:
 		layer_height = std::move(g.layer_height);
 	}
 	virtual ~isometric_model() = default;
+
+	size_type get_name_idx(const string& name) override
+	{
+		if (name == string(first_name))
+			return 0;
+		if (name == string(second_name))
+			return 1;
+		if (name == string(third_name))
+			return 2;
+	}
 
 	isometric_model<FloatT>& operator=(const isometric_model<FloatT>& g)
 	{

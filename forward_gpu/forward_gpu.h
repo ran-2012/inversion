@@ -14,7 +14,7 @@ public:
 	using float_t=global::float_t;
 	using string=std::string;
 	using vector=std::vector<float_t>;
-	using geoelectric_model=isometric_model<float_t>;
+	using geoelectric_model=geoelectric_model<float_t>;
 	using forward_data=forward_data<float_t>;
 	using filter_coefficient=filter_coefficient<float_t>;
 
@@ -23,6 +23,8 @@ public:
 protected:
 	filter_coefficient f;
 	geoelectric_model g;
+
+	forward_data time_template;
 	forward_data d;
 
 	virtual void check_coef()
@@ -43,9 +45,14 @@ public:
 		f = coef;
 	}
 
-	virtual void load_geo_model(geoelectric_model &mod)
+	virtual void load_geo_model(const geoelectric_model &mod)
 	{
 		g = mod;
+	}
+
+	virtual void load_forward_data(const forward_data& data)
+	{
+		time_template = data;
 	}
 
 	virtual forward_data forward() = 0;
