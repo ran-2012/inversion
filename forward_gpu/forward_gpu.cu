@@ -14,6 +14,10 @@
 #include "../data/data.h"
 #include "../global/global.h"
 
+__device__ constexpr float_t a1 = -7.91001919000e+00;
+__device__ constexpr float_t s1 = 8.79671439570e-02;
+__device__ constexpr float_t mu0 = global::mu0;
+__device__ constexpr float_t pi = global::pi;
 
 void forward_gpu::init_cuda_device()
 {
@@ -39,19 +43,45 @@ __host__ thrust::complex<float_t> return_dHz_w(float_t a, float_t i0, float_t h,
 	device_array *height,
 	thrust::complex<float_t> w)
 {
-	constexpr float_t a1 = -7.91001919000e+00;
-	constexpr float_t s1 = 8.79671439570e-02;
+	using complex = thrust::complex<float_t>;
 
-	thrust::complex<float_t> ret(0, 0);
+	complex ret(0, 0);
 
 	const float_t* hankel_ptr = hankel->get();
+	const float_t* res_ptr = resistence->get();
+	const float_t* height_ptr = height->get();
+
+	const int res_size = resistence->size();
 	const int hankel_size = hankel->size();
+
 	for (int k = 0; k < hankel_size; ++k)
 	{
-		const thrust::complex<float_t> i(0, 1);
+		const complex i(0, 1);
 		const float_t lmd = 1 / a * pow(10, a1 + (k*s1));
-		const thrust::complex<float_t> u1 = sqrt(pow(lmd, 2) - i * w*mu0 / res(0));
+
+		const complex u1 = sqrt(pow(lmd, 2) - i * w*mu0 / res_ptr[0]);
+
+		complex r0 = 1;
+		for (int cc = res_size - 2; cc > 00; --cc)
+		{
+			const float_t lmd_2 = pow(lmd, 2);
+			const complex wi = i * w*mu0;
+			
+			const complex ui = sqrt(lmd_2- wi / res_ptr[cc]);
+			const complex uii = sqrt(lmd_2 - wi / res_ptr[cc + 1]);
+
+			const complex ss = ui / uii * r0;
+			const complex ex1 = exp(-2 * ui*height_ptr[cc]);
+			const complex ctan1 = (1 + ex1) / (1 - ex1);
+			
+			r0 = (1 + ctan1 * ss) / (ctan1 + ss);
+		}
+		const complex f1 = 1 + (lmd - u1 / r0) / (lmd + u1 / r0)*exp(-2 * lmd*h);
+
+		ret += f1 * lmd*hankel_ptr[k];
 	}
+	ret = ret * i0 / 2;
+	return ret;
 }
 
 //计算正演kernel函数
@@ -70,17 +100,15 @@ __global__ void forward_kernel(float_t a, float_t i0, float_t h,
 	device_array *resistence,
 	device_array *height,
 	device_array *time,
-	device_array *reponse_late_m,
-	device_array *reponse_late_e)
+	device_array *response_late_m,
+	device_array *response_late_e)
 {
-	constexpr float_t mu0 = global::mu0;
-	constexpr float_t pi = global::pi;
 	
 	const int time_idx = blockIdx.x;
 	const int time_num = blockDim.x;
 	const int cosine_idx = threadIdx.x;
 
-	extern __shared__ thrust::complex<float_t> res_complex[];
+	extern __shared__ float_t res_complex[];
 	__shared__ float_t t;
 	__shared__ float_t* cosine_ptr;
 
@@ -93,7 +121,7 @@ __global__ void forward_kernel(float_t a, float_t i0, float_t h,
 
 	__syncthreads();
 
-	thrust::complex<float_t> w = 1 / t * std::exp<float_t>((-150 + cosine_idx - 1)*std::log(10.0) / 20);
+	float_t w = 1 / t * exp((-150 + cosine_idx - 1)*std::log(10.0) / 20);
 	thrust::complex<float_t> hz_w = return_dHz_w(a, i0, h, hankel, resistence, height, w);
 
 	res_complex[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
@@ -112,9 +140,11 @@ __global__ void forward_kernel(float_t a, float_t i0, float_t h,
 	if (cosine_idx == 0)
 	{
 		const float_t t = time->get()[time_idx];
-		const float_t res = std::sqrt(std::pow(res_complex->real(), 2) + std::pow(res_complex->imag, 2));
+		const float_t dHz = sqrt(2 / pi) / t * res_complex[0];
 
-		reponse_late_m->get()[time_idx] = mu0 * pow(pi*i0*std::pow(a, 2) / 30 / res, 2.0 / 3) / pi / t;
+		if(response_late_m)
+			response_late_m->get()[time_idx] = mu0 * pow(pi*i0*std::pow(a, 2) / 30 / abs(dHz), 2.0 / 3) / pi / t;
+
 	}
 }
 
@@ -140,6 +170,8 @@ void forward_gpu::test_cuda_device()
 	copy_to_device(b, db.get(), size);
 
 	test_device_kernel <<<1, 32 >>> (da, db, dc, size);
+	auto err = cudaDeviceSynchronize();
+	CHECK;
 
 	copy_to_host(dc.get(), c.get(), size);
 
