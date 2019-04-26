@@ -11,7 +11,7 @@ void forward_gpu::test_cuda_device()
 	gpu::test_cuda_device();
 }
 
-forward_gpu::forward_data forward_gpu::forward()
+forward_data forward_gpu::forward()
 {
 	return forward_data();
 }

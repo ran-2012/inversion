@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 
+#define LOG(msg) global::log(__FUNCTIONW__, msg)
+
 namespace global
 {
 	namespace detail

@@ -13,11 +13,6 @@ PYBIND11_MODULE(data_py, m)
 
 	//float type used in forwarding process
 	using float_t=global::float_t;
-	using data_model_base=data_model_base<float_t>;
-	using geoelectric_model=geoelectric_model<float_t>;
-	using isometric_model=isometric_model<float_t>;
-	using forward_data=forward_data<float_t>;
-	using filter_coefficient=filter_coefficient<float_t>;
 
 	//data_model_base
 	auto b = py::class_<data_model_base>(m, "data_model_base");

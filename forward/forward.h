@@ -14,9 +14,6 @@ public:
 	using float_t = global::float_t;
 	using string = std::string;
 	using vector = std::vector<float_t>;
-	using geoelectric_model = geoelectric_model<float_t>;
-	using forward_data = forward_data<float_t>;
-	using filter_coefficient = filter_coefficient<float_t>;
 
 	constexpr static float_t threshold = 1e-5;
 
@@ -51,11 +48,6 @@ public:
 
 class forward_gpu : public forward_base
 {
-public:
-	using forward_data = forward_base::forward_data;
-
-protected:
-
 public:
 	forward_gpu() = default;
 	~forward_gpu() = default;

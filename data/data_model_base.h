@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <type_traits>
-#include <typeinfo>
 #include <ios>
 #include <iostream>
 #include <fstream>
@@ -16,30 +15,18 @@
 #include "../global/global.h"
 
 //地电模型与正演结果基类
-template<typename FloatT = global::float_t>
 class data_model_base
 {
 protected:
-	using string=std::string;
-	using vector=std::vector<FloatT>;
-	using size_type=typename vector::size_type;
-	using json=nlohmann::json;
+	using float_t = global::float_t;
+	using string = std::string;
+	using vector = std::vector<float_t>;
+	using size_type = vector::size_type;
+	using json = nlohmann::json;
 
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
 
-	//检查模板参数是否为浮点类型
-	void check_type()
-	{
-		if (!std::is_floating_point<FloatT>::value)
-		{
-			std::stringstream msg;
-			msg << "模板参数FloatT不是浮点数，";
-			msg << "其中 FloatT = ";
-			msg << typeid(FloatT).name();
-			throw std::invalid_argument(msg.str());
-		}
-	}
 	static void throw_critical_data_miss_exception(const string& data_name)
 	{
 		std::stringstream msg;
@@ -48,6 +35,7 @@ protected:
 		msg << "不存在";
 		throw std::runtime_error(msg.str());
 	}
+
 	static void ordinary_data_miss(const string& data_name)
 	{
 		std::stringstream msg;
@@ -67,6 +55,7 @@ protected:
 		}
 		version = j[_version()].get<string>();
 	}
+
 	virtual void load_name(const json& j)
 	{
 		if (!j.count(_name()))
@@ -75,6 +64,7 @@ protected:
 		}
 		name = j[_name()].get<string>();
 	}
+
 	virtual void load_comment(const json& j)
 	{
 		if (!j.count(_comment()))
@@ -85,6 +75,7 @@ protected:
 		}
 		comment = j[_comment()].get<string>();
 	}
+
 	virtual void load_count(const json& j)
 	{
 		if (!j.count(_count()))
@@ -93,6 +84,7 @@ protected:
 		}
 		count = j[_count()].get<size_type>();
 	}
+
 	virtual void load_data(const json& j)
 	{
 		if (!j.count(_data()))
@@ -107,14 +99,14 @@ protected:
 		{
 			for (size_type i = 0; i < _data_content_count(); ++i)
 			{
-				auto temp = item[data_names[i]].get<FloatT>();
+				auto temp = item[data_names[i]].get<float_t>();
 				data[i].push_back(temp);
 			}
 		}
-		if (count != data[0].size())
+		if (count != size())
 		{
 			std::cerr << "JSON中的count与实际数据不符" << std::endl;
-			count = data[0].size();
+			count = size();
 		}
 	}
 
@@ -125,9 +117,12 @@ protected:
 	virtual string _data() { return string("data"); }
 
 	virtual size_type _data_content_count() { return _data_content_name().size(); }
-	virtual std::vector<string> _data_content_name() { return { "" }; }
+	virtual std::vector<string> _data_content_name() { return {""}; }
 
-	virtual void load_additional_data(const json& j) {}
+	virtual void load_additional_data(const json& j)
+	{
+	}
+
 	virtual json save_additional_data() { return json(); }
 
 public:
@@ -140,40 +135,36 @@ public:
 
 	data_model_base()
 	{
-		check_type();
 		version = default_version;
 		comment = default_comment;
 		count = 0;
 	}
-	data_model_base(const data_model_base<FloatT>& d)
+
+	data_model_base(const data_model_base& d) noexcept : count(d.count)
 	{
-		check_type();
 		*this = d;
 	}
-	data_model_base(data_model_base<FloatT>&& d) noexcept
+
+	data_model_base(data_model_base&& d) noexcept : count(d.count)
 	{
 		*this = std::move(d);
 	}
+
 	virtual ~data_model_base() = default;
 
 	string get_content_name(size_type idx)
 	{
 		return _data_content_name()[idx];
 	}
+
 	virtual size_type get_name_idx(const string& name)
 	{
 		return 0;
 	}
-	data_model_base<FloatT>& operator=(const data_model_base<FloatT>& d)
-	{
-		version = d.version;
-		name = d.name;
-		comment = d.comment;
-		count = d.count;
-		data = d.data;
-		return *this;
-	}
-	data_model_base<FloatT>& operator=(data_model_base<FloatT>&& d) noexcept
+
+	data_model_base& operator=(const data_model_base& d) = default;
+
+	data_model_base& operator=(data_model_base&& d) noexcept
 	{
 		version = std::move(d.version);
 		name = std::move(d.name);
@@ -182,18 +173,22 @@ public:
 		data = std::move(d.data);
 		return *this;
 	}
+
 	virtual vector& get_item(size_type id)
 	{
 		return data[id];
 	}
+
 	virtual vector& operator[](size_type id)
 	{
 		return data[id];
 	}
+
 	virtual vector& operator[](const string& name)
 	{
 		return data[get_name_idx(name)];
 	}
+
 	virtual void set_item(size_type idx, const vector& p)
 	{
 		if (idx >= data.size())
@@ -203,10 +198,11 @@ public:
 		data[idx] = p;
 	}
 
-	virtual size_type size()
+	virtual size_type size() const
 	{
-		return data.size();
+		return data[0].size();
 	}
+
 	virtual void load_from_file(const string& path) final
 	{
 		std::ifstream input_file;
@@ -242,6 +238,7 @@ public:
 		}
 		load_from_json(j);
 	}
+
 	virtual void save_to_file(const string& path) final
 	{
 		std::ofstream output_file;
@@ -267,6 +264,7 @@ public:
 			std::cerr << "无法写入文件 " << path << std::endl;
 		}
 	}
+
 	virtual void load_from_json(const json& j)
 	{
 		load_version(j);
@@ -277,10 +275,12 @@ public:
 
 		load_additional_data(j);
 	}
+
 	virtual void save_to_json(json& j)
 	{
 		j = save_to_json();
 	}
+
 	virtual json save_to_json()
 	{
 		json j;
@@ -291,7 +291,7 @@ public:
 
 		json data_j;
 		auto names = _data_content_name();
-		for (size_type idx = 0; idx < data[0].size(); ++idx)
+		for (size_type idx = 0; idx < size(); ++idx)
 		{
 			json unit_j;
 			for (size_type i = 0; i < _data_content_count(); ++i)
