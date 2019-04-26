@@ -23,17 +23,24 @@ using complex = std::complex<float_f>;
 	}
 //对err进行错误检查，需定义err为cudaError_t
 #define CHECK CHECK_CUDA_ERROR(err)
+
 //复制host内存内容到device中
-template<typename T>
-void copy_to_device(const T* host, T* device, size_t size)
+namespace gpu
 {
-	auto err = cudaMemcpy(device, host, size*sizeof(T), cudaMemcpyHostToDevice);
-	CHECK
-}
-//复制device显存内容到host中
-template<typename T>
-void copy_to_host(T* device, T* host, size_t size)
-{
-	auto err = cudaMemcpy(device, host, size*sizeof(T), cudaMemcpyDeviceToHost);
-	CHECK
+	using float_t = global::float_t;
+
+	template <typename T>
+	void copy_to_device(const T* host, T* device, size_t size)
+	{
+		auto err = cudaMemcpy(device, host, size * sizeof(T), cudaMemcpyHostToDevice);
+		CHECK
+	}
+
+	//复制device显存内容到host中
+	template <typename T>
+	void copy_to_host(T* device, T* host, size_t size)
+	{
+		auto err = cudaMemcpy(host, device, size * sizeof(T), cudaMemcpyDeviceToHost);
+		CHECK
+	}
 }
