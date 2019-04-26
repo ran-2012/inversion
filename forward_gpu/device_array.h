@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cmath>
 #include <cassert>
@@ -12,14 +12,14 @@
 #include "cuda_helper.h"
 #include "device_ptr.h"
 
-//deviceÊı×é
+//deviceæ•°ç»„
 class device_array
 {
 private:
-	device_ptr<float_t> device_mem;
+	device_ptr<float_f> device_mem;
 	size_t device_mem_size;
 
-	//ÔÚÏÔ´æÖĞµÄthis
+	//åœ¨æ˜¾å­˜ä¸­çš„this
 	device_ptr<device_array> device_this_ptr;
 
 	__host__ void allocate_device_this_ptr()
@@ -30,12 +30,11 @@ private:
 	}
 
 public:
-	device_array() :device_mem_size(0)
+	device_array() : device_mem_size(0)
 	{
-
 	}
 
-	device_array(const std::vector<float_t>& vec) :device_mem_size(vec.size())
+	device_array(const std::vector<float_f>& vec) : device_mem_size(vec.size())
 	{
 		device_mem.allocate(vec.size());
 		copy_to_device(vec.data(), device_mem.get(), device_mem_size);
@@ -48,17 +47,17 @@ public:
 		return device_this_ptr.get();
 	}
 
-	__host__ void load_data(const std::vector<float_t> &vec)
+	__host__ void load_data(const std::vector<float_f>& vec)
 	{
 		device_mem.release();
 		device_mem.allocate(vec.size());
 		copy_to_device(vec.data(), device_mem.get(), device_mem_size);
 	}
-	
-	__host__ void save_data(std::vector<float_t>& vec)
+
+	__host__ void save_data(std::vector<float_f>& vec)
 	{
 		assert(device_mem.get());
-		float_ptr host_mem(new float_t(device_mem_size));
+		float_ptr host_mem(new float_f[device_mem_size]);
 
 		copy_to_host(device_mem.get(), host_mem.get(), device_mem_size);
 
@@ -69,21 +68,23 @@ public:
 			vec[i] = host_mem.get()[i];
 		}
 	}
-	//·ÃÎÊÊı¾İÖ¸Õë£¬½ökernelÖĞ¿É·ÃÎÊ
-	__device__ float_t* get()
+
+	//è®¿é—®æ•°æ®æŒ‡é’ˆï¼Œä»…kernelä¸­å¯è®¿é—®
+	__device__ float_f* get()
 	{
 		return device_mem.get();
 	}
-	//·ÃÎÊÊı¾İ£¬½ökernelÖĞ¿É·ÃÎÊ
-	__device__ float_t& operator[](size_t idx)
+
+	//è®¿é—®æ•°æ®ï¼Œä»…kernelä¸­å¯è®¿é—®
+	__device__ float_f& operator[](size_t idx)
 	{
 		assert(device_mem.get());
 		return device_mem.get()[idx];
 	}
-	//»ñÈ¡´óĞ¡£¬½ökernelÖĞ¿É·ÃÎÊ
-	__device__ size_t size()
+
+	//è·å–å¤§å°ï¼Œä»…kernelä¸­å¯è®¿é—®
+	__host__ __device__ size_t size() const
 	{
 		return device_mem_size;
 	}
-
 };

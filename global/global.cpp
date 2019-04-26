@@ -12,50 +12,70 @@
 #include <sstream>
 #include <iomanip>
 #include <chrono>
+#include <iostream>
 
 namespace global
 {
 	namespace detail
 	{
-		void _log(const std::string& tag, const std::string& content)
+		void _log(const std::string& tag, const std::string& content) noexcept
 		{
-			std::stringstream msg;
-			msg << current_time() << "\t";
-			msg << tag << " | " << content << "\n";
+			try
+			{
+				std::stringstream msg;
+				msg << current_time() << "\t";
+				msg << tag << " | " << content << "\n";
 #if defined(_MSC_VER) && defined(_DEBUG)
-			OutputDebugString(msg.str().c_str());
+				OutputDebugString(msg.str().c_str());
 #else
-			std::clog << msg.str() << std::flush;
+				std::clog << msg.str() << std::flush;
 #endif
+
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
 		}
 
 		class _scoped_timer
 		{
 			using clock = std::chrono::steady_clock;
 			using time_point = std::chrono::time_point<std::chrono::steady_clock>;
+			using duration=std::chrono::milliseconds;
 
 			clock clk;
 			time_point begin;
 			std::string name;
 
 		public:
-			_scoped_timer(std::string n) 
+			_scoped_timer(std::string n = std::string()) 
 			{
 				name = n;
-				begin.now();
+				begin = clk.now();
 			}
 
 			~_scoped_timer()
 			{
 				time_point end = clk.now();
-				auto t = std::chrono::duration_cast<duration>(end - begin).count/1000;
+				auto t = std::chrono::duration_cast<duration>(end - begin).count()/1000;
 
 				std::stringstream msg;
-				msg << name << " excuted in " << t << "ms";
+				msg << name << " executed in " << t << "ms";
 
 				log("timer", msg.str());
 			}
 		};
+	}
+
+	scoped_timer::scoped_timer(std::string name)
+	{
+		timer = static_cast<void*>(new detail::_scoped_timer(name));
+	}
+
+	scoped_timer::~scoped_timer()
+	{
+		delete static_cast<detail::_scoped_timer*>(timer);
 	}
 
 	std::string current_time()

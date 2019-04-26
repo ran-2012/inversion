@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <type_traits>
 #include <typeinfo>
@@ -15,7 +15,7 @@
 
 #include "../global/global.h"
 
-//µØµçÄ£ĞÍÓëÕıÑİ½á¹û»ùÀà
+//åœ°ç”µæ¨¡å‹ä¸æ­£æ¼”ç»“æœåŸºç±»
 template<typename FloatT = global::float_t>
 class data_model_base
 {
@@ -28,14 +28,14 @@ protected:
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
 
-	//¼ì²éÄ£°å²ÎÊıÊÇ·ñÎª¸¡µãÀàĞÍ
+	//æ£€æŸ¥æ¨¡æ¿å‚æ•°æ˜¯å¦ä¸ºæµ®ç‚¹ç±»å‹
 	void check_type()
 	{
 		if (!std::is_floating_point<FloatT>::value)
 		{
 			std::stringstream msg;
-			msg << "Ä£°å²ÎÊıFloatT²»ÊÇ¸¡µãÊı£¬";
-			msg << "ÆäÖĞ FloatT = ";
+			msg << "æ¨¡æ¿å‚æ•°FloatTä¸æ˜¯æµ®ç‚¹æ•°ï¼Œ";
+			msg << "å…¶ä¸­ FloatT = ";
 			msg << typeid(FloatT).name();
 			throw std::invalid_argument(msg.str());
 		}
@@ -43,17 +43,17 @@ protected:
 	static void throw_critical_data_miss_exception(const string& data_name)
 	{
 		std::stringstream msg;
-		msg << "¹Ø¼üÊı¾İ";
+		msg << "å…³é”®æ•°æ®";
 		msg << data_name;
-		msg << "²»´æÔÚ";
+		msg << "ä¸å­˜åœ¨";
 		throw std::runtime_error(msg.str());
 	}
 	static void ordinary_data_miss(const string& data_name)
 	{
 		std::stringstream msg;
-		msg << "Êı¾İ";
+		msg << "æ•°æ®";
 		msg << data_name;
-		msg << "²»´æÔÚ";
+		msg << "ä¸å­˜åœ¨";
 		std::cerr << msg.str() << std::endl;
 	}
 
@@ -113,7 +113,7 @@ protected:
 		}
 		if (count != data[0].size())
 		{
-			std::cerr << "JSONÖĞµÄcountÓëÊµ¼ÊÊı¾İ²»·û" << std::endl;
+			std::cerr << "JSONä¸­çš„countä¸å®é™…æ•°æ®ä¸ç¬¦" << std::endl;
 			count = data[0].size();
 		}
 	}
@@ -182,6 +182,10 @@ public:
 		data = std::move(d.data);
 		return *this;
 	}
+	virtual vector& get_item(size_type id)
+	{
+		return data[id];
+	}
 	virtual vector& operator[](size_type id)
 	{
 		return data[id];
@@ -194,7 +198,7 @@ public:
 	{
 		if (idx >= data.size())
 		{
-			throw(std::runtime_error("idx³¬¹ıdataµÄÊı¾İ·¶Î§"));
+			throw(std::runtime_error("idxè¶…è¿‡dataçš„æ•°æ®èŒƒå›´"));
 		}
 		data[idx] = p;
 	}
@@ -213,16 +217,16 @@ public:
 			if (!input_file)
 			{
 				std::stringstream msg;
-				msg << "ÎÄ¼ş";
+				msg << "æ–‡ä»¶";
 				msg << path;
-				msg << "²»´æÔÚ";
+				msg << "ä¸å­˜åœ¨";
 				throw std::runtime_error(msg.str());
 			}
 		}
 		catch (std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "ÎŞ·¨´ò¿ªÎÄ¼ş " << path << std::endl;
+			std::cerr << "æ— æ³•æ‰“å¼€æ–‡ä»¶ " << path << std::endl;
 			return;
 		}
 		try
@@ -233,7 +237,7 @@ public:
 		catch (std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "ÎŞ·¨¼ÓÔØJSON " << path << std::endl;
+			std::cerr << "æ— æ³•åŠ è½½JSON " << path << std::endl;
 			return;
 		}
 		load_from_json(j);
@@ -249,7 +253,7 @@ public:
 		catch (std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "ÎŞ·¨´ò¿ªÎÄ¼ş" << path << std::endl;
+			std::cerr << "æ— æ³•æ‰“å¼€æ–‡ä»¶" << path << std::endl;
 			return;
 		}
 		try
@@ -260,7 +264,7 @@ public:
 		catch (std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
-			std::cerr << "ÎŞ·¨Ğ´ÈëÎÄ¼ş " << path << std::endl;
+			std::cerr << "æ— æ³•å†™å…¥æ–‡ä»¶ " << path << std::endl;
 		}
 	}
 	virtual void load_from_json(const json& j)

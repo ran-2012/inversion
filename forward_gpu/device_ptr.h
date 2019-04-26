@@ -12,16 +12,17 @@
 #include "../global/global.h"
 
 //device数据智能指针，自动释放显存
-template<typename T = float_t>
+template <typename T = float_t>
 class device_ptr
 {
 private:
-	float_t *device_mem;
+	T* device_mem;
 
 public:
 	device_ptr() { device_mem = nullptr; }
 	device_ptr(const device_ptr<T>& p) = delete;
-	device_ptr(device_ptr<T>&& p) noexcept :device_mem(p.device_mem)
+
+	device_ptr(device_ptr<T>&& p) noexcept : device_mem(p.device_mem)
 	{
 		p.device_mem = nullptr;
 	}
@@ -44,10 +45,12 @@ public:
 		auto err = cudaMalloc(&device_mem, size * sizeof(T));
 		CHECK;
 	}
+
 	__host__ __device__ T* get()
 	{
 		return device_mem;
 	}
+
 	void release() noexcept
 	{
 		if (!device_mem)

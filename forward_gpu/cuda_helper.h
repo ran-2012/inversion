@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <sstream>
 #include <complex>
@@ -7,11 +7,11 @@
 
 #include "../global/global.h"
 
-using float_t = global::float_t;
-using float_ptr = std::unique_ptr<float_t[]>;
-using complex = std::complex<float_t>;
+using float_f = global::float_t;
+using float_ptr = std::unique_ptr<float_f[]>;
+using complex = std::complex<float_f>;
 
-//cuda´íÎó´úÂë¼ì²é
+//cudaé”™è¯¯ä»£ç æ£€æŸ¥
 #define CHECK_CUDA_ERROR(err)\
 	if(err!=cudaSuccess)\
 	{\
@@ -21,16 +21,16 @@ using complex = std::complex<float_t>;
 		msg << "at line: " << __LINE__;\
 		throw std::runtime_error(msg.str());\
 	}
-//¶Ôerr½øĞĞ´íÎó¼ì²é£¬Ğè¶¨ÒåerrÎªcudaError_t
+//å¯¹errè¿›è¡Œé”™è¯¯æ£€æŸ¥ï¼Œéœ€å®šä¹‰errä¸ºcudaError_t
 #define CHECK CHECK_CUDA_ERROR(err)
-//¸´ÖÆhostÄÚ´æÄÚÈİµ½deviceÖĞ
+//å¤åˆ¶hostå†…å­˜å†…å®¹åˆ°deviceä¸­
 template<typename T>
 void copy_to_device(const T* host, T* device, size_t size)
 {
 	auto err = cudaMemcpy(device, host, size*sizeof(T), cudaMemcpyHostToDevice);
 	CHECK
 }
-//¸´ÖÆdeviceÏÔ´æÄÚÈİµ½hostÖĞ
+//å¤åˆ¶deviceæ˜¾å­˜å†…å®¹åˆ°hostä¸­
 template<typename T>
 void copy_to_host(T* device, T* host, size_t size)
 {
