@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <ios>
 #include <iostream>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -24,6 +25,7 @@ protected:
 	using size_type = vector::size_type;
 	using json = nlohmann::json;
 
+	static constexpr char index_name[] = "idx";
 	static constexpr char default_version[] = "0.1.0";
 	static constexpr char default_comment[] = "";
 
@@ -38,11 +40,7 @@ protected:
 
 	static void ordinary_data_miss(const string& data_name)
 	{
-		std::stringstream msg;
-		msg << "数据";
-		msg << data_name;
-		msg << "不存在";
-		std::cerr << msg.str() << std::endl;
+		global::err("数据", data_name, "不存在");
 	}
 
 	virtual void load_version(const json& j)
@@ -91,22 +89,31 @@ protected:
 		{
 			throw_critical_data_miss_exception(_data());
 		}
-		json data_j = j[_data()];
+		auto data_j = j[_data()];
 		auto data_names = _data_content_name();
 		data.clear();
 		data.resize(_data_content_count());
-		for (auto& item : data_j)
+
+		const auto c = j[_count()].get<size_type>();
+		for (auto& item : data)
+			item.resize(c);
+		try
 		{
-			for (size_type i = 0; i < _data_content_count(); ++i)
+			for (auto& item_j : data_j)
 			{
-				auto temp = item[data_names[i]].get<float_t>();
-				data[i].push_back(temp);
+				size_type idx = static_cast<size_type>(std::round(item_j[index_name].get<float_t>() - 1));
+				for (size_type i = 1; i < _data_content_count(); ++i)
+				{
+					auto temp = item_j[data_names[i]].get<float_t>();
+					data[i][idx] = temp;
+				}
 			}
 		}
-		if (count != size())
+		catch (std::out_of_range& e)
 		{
-			std::cerr << "JSON中的count与实际数据不符" << std::endl;
-			count = size();
+			global::err(e.what());
+			global::err("数据中的count或idx有误");
+			throw;
 		}
 	}
 
@@ -116,8 +123,8 @@ protected:
 	virtual string _count() { return string("count"); }
 	virtual string _data() { return string("data"); }
 
-	virtual size_type _data_content_count() { return _data_content_name().size(); }
-	virtual std::vector<string> _data_content_name() { return {""}; }
+	size_type _data_content_count() { return _data_content_name().size(); }
+	virtual std::vector<string> _data_content_name() { return {index_name}; }
 
 	virtual void load_additional_data(const json& j)
 	{
@@ -138,6 +145,7 @@ public:
 		version = default_version;
 		comment = default_comment;
 		count = 0;
+		data.resize(_data_content_count());
 	}
 
 	data_model_base(const data_model_base& d) noexcept : count(d.count)
@@ -212,17 +220,13 @@ public:
 			input_file.open(path, std::ifstream::in);
 			if (!input_file)
 			{
-				std::stringstream msg;
-				msg << "文件";
-				msg << path;
-				msg << "不存在";
-				throw std::runtime_error(msg.str());
+				throw std::runtime_error(global::msg("文件", path, "不存在"));
 			}
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
-			std::cerr << "无法打开文件 " << path << std::endl;
+			global::err(e.what());
+			global::err("无法打开文件", path);
 			return;
 		}
 		try
@@ -232,8 +236,8 @@ public:
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
-			std::cerr << "无法加载JSON " << path << std::endl;
+			global::err(e.what());
+			global::err("加载json失败", path);
 			return;
 		}
 		load_from_json(j);
@@ -249,8 +253,8 @@ public:
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
-			std::cerr << "无法打开文件" << path << std::endl;
+			global::err(e.what());
+			global::err("无法打开文件", path);
 			return;
 		}
 		try
@@ -260,8 +264,8 @@ public:
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << e.what() << std::endl;
-			std::cerr << "无法写入文件 " << path << std::endl;
+			global::err(e.what());
+			global::err("无法写入文件", path);
 		}
 	}
 

@@ -14,10 +14,10 @@ class forward_data : public data_model_base
 	using string = std::string;
 	using json = nlohmann::json;
 
-	static constexpr char first_name[] = "time";
-	static constexpr char second_name[] = "response";
+	static constexpr char second_name[] = "time";
+	static constexpr char third_name[] = "response";
 
-	std::vector<string> _data_content_name() override { return {first_name, second_name}; }
+	std::vector<string> _data_content_name() override { return {index_name, second_name, third_name}; }
 
 	void load_additional_data(const json& j) override
 	{
@@ -47,10 +47,10 @@ public:
 
 	size_type get_name_idx(const string& name) override
 	{
-		if (name == string(first_name))
-			return 0;
 		if (name == string(second_name))
 			return 1;
+		if (name == string(third_name))
+			return 2;
 		return 0;
 	}
 
@@ -77,7 +77,6 @@ protected:
 	using pair = std::pair<float_t, float_t>;
 	using size_type = typename data_model_base::size_type;
 
-	static constexpr char first_name[] = "idx";
 	static constexpr char second_name[] = "resistivity";
 
 	virtual void load_layer_height(const json& j)
@@ -90,7 +89,7 @@ protected:
 		layer_height = j[_layer_height()].get<float_t>();
 	}
 
-	std::vector<string> _data_content_name() override { return {first_name, second_name}; }
+	std::vector<string> _data_content_name() override { return {index_name, second_name}; }
 	virtual string _layer_height() { return string("layer_height"); }
 
 	void load_additional_data(const json& j) override
@@ -127,8 +126,6 @@ public:
 
 	size_type get_name_idx(const string& name) override
 	{
-		if (name == string(first_name))
-			return 0;
 		if (name == string(second_name))
 			return 1;
 		return 0;
@@ -154,11 +151,10 @@ class geoelectric_model : public data_model_base
 	using string = std::string;
 	using json = nlohmann::json;
 
-	static constexpr char first_name[] = "idx";
 	static constexpr char second_name[] = "height";
 	static constexpr char third_name[] = "resistivity";
 
-	std::vector<string> _data_content_name() override { return {first_name, second_name, third_name}; }
+	std::vector<string> _data_content_name() override { return {index_name, second_name, third_name}; }
 
 	void load_additional_data(const json& j) override
 	{
@@ -188,8 +184,6 @@ public:
 
 	size_type get_name_idx(const string& name) override
 	{
-		if (name == string(first_name))
-			return 0;
 		if (name == string(second_name))
 			return 1;
 		if (name == string(third_name))

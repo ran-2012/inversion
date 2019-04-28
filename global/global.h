@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #define LOG(msg) global::log(__FUNCTIONW__, msg)
 
@@ -9,21 +10,41 @@ namespace global
 {
 	namespace detail
 	{
-		void _log(const std::string& tag, const std::string& content)noexcept;
+		void _log(const std::string& tag, const std::string& content) noexcept;
 	}
+
 	std::string current_time();
 
+	//将多个变量合并为字符串
+	template <typename T>
+	std::string msg(const T& t)
+	{
+		return std::string(t);
+	}
+
+	//将多个变量合并为字符串
+	template <typename T, typename ...Args>
+	std::string msg(const T& t, const Args&...args)
+	{
+		std::stringstream ss;
+		ss << t << msg(args...);
+		return ss.str();
+	}
+
+	//输出错误信息到std::cerr
+	template <typename...Args>
+	void err(const Args& ...args)
+	{
+		std::cerr << msg(args...) << std::endl;
+	}
+
 	//输出日志到输出窗口，类型T与U必须可序列化
-	template<typename T, typename U>
-	void log(const T& tag, const U& content) noexcept
+	template <typename T, typename ...Args>
+	void log(const T& tag, const Args& ...content) noexcept
 	{
 		try
 		{
-			std::stringstream tag_s, content_s;
-			tag_s << tag;
-			content_s << content;
-			detail::_log(tag_s.str(), content_s.str());
-
+			detail::_log(msg(tag), msg(content...));
 		}
 		catch (std::exception& e)
 		{
@@ -45,7 +66,6 @@ namespace global
 
 namespace global
 {
-
 	//计算过程中使用的浮点类型
 	using float_t = double;
 

@@ -30,7 +30,7 @@ namespace gpu
 
 	__device__ thrust::complex<float_t> return_dHz_w(float_t a, float_t i0, float_t h,
 	                                                 device_array* hankel,
-	                                                 device_array* resistence,
+	                                                 device_array* resistivity,
 	                                                 device_array* height,
 	                                                 thrust::complex<float_t> w)
 	{
@@ -39,10 +39,10 @@ namespace gpu
 		complex ret(0, 0);
 
 		const float_t* hankel_ptr = hankel->get();
-		const float_t* res_ptr = resistence->get();
+		const float_t* res_ptr = resistivity->get();
 		const float_t* height_ptr = height->get();
 
-		const int res_size = resistence->size();
+		const int res_size = resistivity->size();
 		const int hankel_size = hankel->size();
 
 		for (int k = 0; k < hankel_size; ++k)
@@ -189,9 +189,9 @@ namespace gpu
 	}
 
 	void forward(const vector& consine, const vector& hankel,
-	                  const vector& resistivity, const vector& height,
-	                  const vector& time,
-	                  vector& response_late_m, vector& response_late_e)
+	             const vector& resistivity, const vector& height,
+	             const vector& time,
+	             vector& response_late_m, vector& response_late_e)
 	{
 	}
 }
