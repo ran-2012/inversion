@@ -26,9 +26,8 @@ namespace global
 	template <typename T, typename ...Args>
 	std::string msg(const T& t, const Args&...args)
 	{
-		std::stringstream ss;
-		ss << t << msg(args...);
-		return ss.str();
+		std::string ss = t;
+		return ss + msg(args...);
 	}
 
 	//输出错误信息到std::cerr

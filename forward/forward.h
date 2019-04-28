@@ -24,12 +24,9 @@ protected:
 	forward_data time_template;
 	forward_data d;
 
-	virtual void check_coef()
+	virtual bool check_coef()
 	{
-		if (f.hkl_coef.empty() || f.sin_coef.empty() || f.cos_coef.empty() || f.gs_coef.empty())
-		{
-			throw std::runtime_error("没有绑定滤波参数");
-		}
+		return !(f.hkl_coef.empty() || f.cos_coef.empty());
 	}
 
 public:

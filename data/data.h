@@ -67,6 +67,29 @@ public:
 
 		return *this;
 	}
+
+	void generate_time_stamp(float_t exponent_1, float_t exponet_2, float_t interval)
+	{
+		assert(exponent_1 >= exponet_2);
+
+		const size_t count = std::floor((exponet_2 - exponent_1) / interval) + 1;
+
+		for (auto& item : data)
+			item.resize(count);
+
+		for (size_t i = 0; i < count; ++i)
+		{
+			const float_t exponent = exponent_1 + i * interval;
+			(*this)[index_name][i] = i + 1;
+			(*this)[second_name][i] = exp(exponent/log(10));
+			(*this)[third_name][i] = 0;
+		}
+	}
+
+	void generate_default_time_stamp()
+	{
+		generate_time_stamp(-5, 3, 0.25);
+	}
 };
 
 class isometric_model : public data_model_base

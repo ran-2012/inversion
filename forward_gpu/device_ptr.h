@@ -4,12 +4,10 @@
 #include <cassert>
 #include <sstream>
 #include <memory>
-#include <exception>
 
 #include <cuda_runtime.h>
 
 #include "cuda_helper.h"
-#include "../global/global.h"
 
 namespace gpu
 {

@@ -1,7 +1,6 @@
 ﻿#include <cmath>
 #include <memory>
 #include <complex>
-#include <exception>
 
 #include <cuda_runtime.h>
 #include <thrust/complex.h>
@@ -188,10 +187,25 @@ namespace gpu
 		global::log("test_cuda_device", "test end");
 	}
 
-	void forward(const vector& consine, const vector& hankel,
+	void forward(const vector& cosine, const vector& hankel,
 	             const vector& resistivity, const vector& height,
 	             const vector& time,
 	             vector& response_late_m, vector& response_late_e)
 	{
+		device_array cosine_d(cosine);
+		device_array hankel_d(hankel);
+
+		device_array res_d(resistivity);
+		device_array height_d(height);
+		device_array time_d(time);
+
+		device_array late_m_d(time.size());
+		device_array late_e_d(time.size());
+
+
+
+
+		late_m_d.save_data(response_late_m);
+		late_e_d.save_data(response_late_e);
 	}
 }

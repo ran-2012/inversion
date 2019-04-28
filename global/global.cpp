@@ -1,18 +1,15 @@
-﻿
-#include "global.h"
-
-#if defined(_MSC_VER) && defined(_DEBUG)
-#include <atlbase.h>
-#else
-#include <iostream>
-#endif
-
-#include <ctime>
+﻿#include <ctime>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <chrono>
 #include <iostream>
+
+#include "global.h"
+
+#if defined(_MSC_VER) && defined(_DEBUG)
+#include <atlbase.h>
+#endif
 
 namespace global
 {

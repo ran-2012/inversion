@@ -1,14 +1,8 @@
 ﻿#pragma once
 
-#include <cmath>
 #include <cassert>
-#include <sstream>
 #include <vector>
-#include <exception>
 
-#include <cuda_runtime.h>
-
-#include "../global/global.h"
 #include "cuda_helper.h"
 #include "device_ptr.h"
 
@@ -36,6 +30,7 @@ namespace gpu
 		{
 		}
 
+		//复制vector中内存到显存中
 		device_array(const std::vector<float_t>& vec) : device_mem_size(vec.size())
 		{
 			device_mem.allocate(vec.size());
@@ -44,7 +39,14 @@ namespace gpu
 			allocate_device_this_ptr();
 		}
 
-		__host__ device_array* get_device_ptr()
+		//分配指定大小显存
+		device_array(size_t size) : device_mem_size(size)
+		{
+			device_mem.allocate(size);
+			allocate_device_this_ptr();
+		}
+
+		__host__ device_array* get_device_ptr() const
 		{
 			return device_this_ptr.get();
 		}
@@ -56,7 +58,7 @@ namespace gpu
 			copy_to_device(vec.data(), device_mem.get(), device_mem_size);
 		}
 
-		__host__ void save_data(std::vector<float_t>& vec)
+		__host__ void save_data(std::vector<float_t>& vec) const
 		{
 			assert(device_mem.get());
 			float_ptr host_mem(new float_t[device_mem_size]);
@@ -72,7 +74,7 @@ namespace gpu
 		}
 
 		//访问数据指针，仅kernel中可访问
-		__device__ float_t* get()
+		__device__ float_t* get() const
 		{
 			return device_mem.get();
 		}
