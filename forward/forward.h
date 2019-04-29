@@ -13,20 +13,20 @@ class forward_base
 public:
 	using float_t = global::float_t;
 	using string = std::string;
-	using vector = std::vector<float_t>;
+	using vector = global::vector;
 
 	constexpr static float_t threshold = 1e-5;
 
 protected:
-	filter_coefficient f;
-	geoelectric_model g;
+	filter_coefficient filter;
+	geoelectric_model geomodel;
 
-	forward_data time_template;
-	forward_data d;
+	forward_data time_stamp;
+	forward_data data;
 
 	virtual bool check_coef()
 	{
-		return !(f.hkl_coef.empty() || f.cos_coef.empty());
+		return !(filter.hkl_coef.empty() || filter.cos_coef.empty());
 	}
 
 public:
@@ -34,16 +34,16 @@ public:
 
 	virtual ~forward_base() = default;
 
-	virtual void load_filter_coef(const filter_coefficient& coef) final { f = coef; }
+	virtual void load_filter_coef(const filter_coefficient& coef) final { filter = coef; }
 
-	virtual void load_geo_model(const geoelectric_model& mod) { g = mod; }
+	virtual void load_geo_model(const geoelectric_model& mod) final { geomodel = mod; }
 
-	virtual void load_forward_data(const forward_data& data) { time_template = data; }
+	virtual void load_forward_data(const forward_data& data) final { time_stamp = data; }
 
 	virtual forward_data forward() = 0;
 };
 
-class forward_gpu : public forward_base
+class forward_gpu final : public forward_base
 {
 public:
 	forward_gpu() = default;

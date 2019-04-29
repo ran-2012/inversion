@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <vector>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -67,6 +68,8 @@ namespace global
 {
 	//计算过程中使用的浮点类型
 	using float_t = double;
+
+	using vector=std::vector<float_t>;
 
 	//pi
 	constexpr float_t pi = 3.14159265359;

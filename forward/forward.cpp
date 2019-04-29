@@ -13,14 +13,17 @@ void forward_gpu::test_cuda_device()
 
 forward_data forward_gpu::forward()
 {
-	assert(g.size());
+	assert(geomodel.size());
 	assert(check_coef());
-	if(d.size()==0)
+	if(data.size()==0)
 	{
-		d.generate_default_time_stamp();
+		data.generate_default_time_stamp();
 	}
 
-
+	gpu::forward(filter.get_cos(), filter.get_hkl(),
+		geomodel["resistivity"], geomodel["height"],
+		time_stamp["time"],
+		data["response"], data["response"]);
 	
 	return forward_data();
 }

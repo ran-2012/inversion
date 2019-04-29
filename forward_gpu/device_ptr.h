@@ -11,7 +11,10 @@
 
 namespace gpu
 {
-	//device数据智能指针，自动释放显存
+	/**
+	 * \brief device数据智能指针，自动释放显存
+	 * \tparam T 数据类型
+	 */
 	template <typename T = float_t>
 	class device_ptr
 	{
@@ -36,10 +39,15 @@ namespace gpu
 		{
 			this->release();
 			device_mem = p.get();
-			p.release();
+			p.device_mem = nullptr;
+
 			return *this;
 		}
 
+		/**
+		 * \brief 分配显存
+		 * \param size 显存大小
+		 */
 		void allocate(size_t size)
 		{
 			release();
@@ -52,6 +60,9 @@ namespace gpu
 			return device_mem;
 		}
 
+		/**
+		 * \brief 释放显存
+		 */
 		void release() noexcept
 		{
 			if (!device_mem)

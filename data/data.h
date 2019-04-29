@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "data_model_base.h"
+#include "../forward_gpu/forward_gpu.h"
 
 //正演数据
 class forward_data;
@@ -9,11 +10,8 @@ class geoelectric_model;
 //等厚地电模型
 class isometric_model;
 
-class forward_data : public data_model_base
+class forward_data final : public data_model_base
 {
-	using string = std::string;
-	using json = nlohmann::json;
-
 	static constexpr char second_name[] = "time";
 	static constexpr char third_name[] = "response";
 
@@ -31,9 +29,7 @@ class forward_data : public data_model_base
 
 public:
 
-	forward_data() : data_model_base()
-	{
-	}
+	forward_data() = default;
 
 	forward_data(const forward_data& f) : data_model_base(f)
 	{
@@ -47,11 +43,13 @@ public:
 
 	size_type get_name_idx(const string& name) override
 	{
+		if (name == string(index_name))
+			return 0;
 		if (name == string(second_name))
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		return 0;
+		throw std::out_of_range("下标错误");
 	}
 
 	forward_data& operator=(const forward_data& f)
@@ -68,20 +66,20 @@ public:
 		return *this;
 	}
 
-	void generate_time_stamp(float_t exponent_1, float_t exponet_2, float_t interval)
+	void generate_time_stamp(float_t exponent_1, float_t exponent_2, float_t interval)
 	{
-		assert(exponent_1 >= exponet_2);
+		assert(exponent_1 >= exponent_2);
 
-		const size_t count = std::floor((exponet_2 - exponent_1) / interval) + 1;
+		const auto count = 1 + static_cast<size_t>(std::floor((exponent_2 - exponent_1) / interval));
 
 		for (auto& item : data)
 			item.resize(count);
 
 		for (size_t i = 0; i < count; ++i)
 		{
-			const float_t exponent = exponent_1 + i * interval;
-			(*this)[index_name][i] = i + 1;
-			(*this)[second_name][i] = exp(exponent/log(10));
+			const auto exponent = exponent_1 + i * interval;
+			(*this)[index_name][i] = static_cast<float_t>(i) + 1;
+			(*this)[second_name][i] = exp(exponent / log(10));
 			(*this)[third_name][i] = 0;
 		}
 	}
@@ -95,10 +93,6 @@ public:
 class isometric_model : public data_model_base
 {
 protected:
-	using json = nlohmann::json;
-	using string = std::string;
-	using pair = std::pair<float_t, float_t>;
-	using size_type = typename data_model_base::size_type;
 
 	static constexpr char second_name[] = "resistivity";
 
@@ -142,16 +136,18 @@ public:
 
 	isometric_model(isometric_model&& g) noexcept : data_model_base(std::move(g))
 	{
-		layer_height = std::move(g.layer_height);
+		layer_height = g.layer_height;
 	}
 
 	virtual ~isometric_model() = default;
 
 	size_type get_name_idx(const string& name) override
 	{
+		if (name == string(index_name))
+			return 0;
 		if (name == string(second_name))
 			return 1;
-		return 0;
+		throw std::out_of_range("下标错误");
 	}
 
 	isometric_model& operator=(const isometric_model& g)
@@ -163,17 +159,14 @@ public:
 
 	isometric_model& operator=(isometric_model&& g) noexcept
 	{
+		layer_height = g.layer_height;
 		this->data_model_base::operator=(std::move(g));
-		layer_height = std::move(g.layer_height);
 		return *this;
 	}
 };
 
 class geoelectric_model : public data_model_base
 {
-	using string = std::string;
-	using json = nlohmann::json;
-
 	static constexpr char second_name[] = "height";
 	static constexpr char third_name[] = "resistivity";
 
@@ -207,11 +200,13 @@ public:
 
 	size_type get_name_idx(const string& name) override
 	{
+		if (name == string(index_name))
+			return 0;
 		if (name == string(second_name))
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		return 0;
+		throw std::out_of_range("下标错误");
 	}
 
 	geoelectric_model& operator=(const geoelectric_model& f)
@@ -243,7 +238,7 @@ public:
 class filter_coefficient
 {
 public:
-	using vector = std::vector<float_t>;
+	using vector = global::vector;
 	using string = std::string;
 
 	vector hkl_coef;
@@ -260,15 +255,7 @@ public:
 
 	~filter_coefficient() = default;
 
-	filter_coefficient& operator=(const filter_coefficient& coef)
-	{
-		hkl_coef = coef.hkl_coef;
-		sin_coef = coef.sin_coef;
-		cos_coef = coef.cos_coef;
-		gs_coef = coef.gs_coef;
-
-		return *this;
-	}
+	filter_coefficient& operator=(const filter_coefficient& coef) = default;
 
 	static void load_coef_from_file(const string& path, vector& v)
 	{
@@ -296,6 +283,9 @@ public:
 		}
 	}
 
+	vector& get_hkl() { return hkl_coef; }
+	vector& get_cos() { return cos_coef; }
+
 	void load_hkl_coef(const string& path)
 	{
 		load_coef_from_file(path, hkl_coef);
@@ -316,7 +306,7 @@ public:
 		load_coef_from_file(path, gs_coef);
 	}
 
-	bool is_valid()
+	bool is_valid() const
 	{
 		return hkl_coef.empty() || sin_coef.empty() || cos_coef.empty() || gs_coef.empty();
 	}

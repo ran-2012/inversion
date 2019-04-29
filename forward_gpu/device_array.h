@@ -31,7 +31,7 @@ namespace gpu
 		}
 
 		//复制vector中内存到显存中
-		device_array(const std::vector<float_t>& vec) : device_mem_size(vec.size())
+		device_array(const vector& vec) : device_mem_size(vec.size())
 		{
 			device_mem.allocate(vec.size());
 			copy_to_device(vec.data(), device_mem.get(), device_mem_size);
@@ -51,14 +51,18 @@ namespace gpu
 			return device_this_ptr.get();
 		}
 
-		__host__ void load_data(const std::vector<float_t>& vec)
+		__host__ void load_data(const vector& vec)
 		{
 			device_mem.release();
 			device_mem.allocate(vec.size());
 			copy_to_device(vec.data(), device_mem.get(), device_mem_size);
 		}
 
-		__host__ void save_data(std::vector<float_t>& vec) const
+		/**
+		 * \brief 保存device中数据到vector中
+		 * \param vec 目标vector
+		 */
+		__host__ void save_data(vector& vec) const
 		{
 			assert(device_mem.get());
 			float_ptr host_mem(new float_t[device_mem_size]);
@@ -80,7 +84,7 @@ namespace gpu
 		}
 
 		//访问数据，仅kernel中可访问
-		__device__ float_t& operator[](size_t idx)
+		__device__ float_t& operator[](size_t idx) const
 		{
 			assert(device_mem.get());
 			return device_mem.get()[idx];

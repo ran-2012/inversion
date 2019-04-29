@@ -6,7 +6,7 @@
 
 namespace gpu
 {
-	using vector = std::vector<global::float_t>;
+	using vector = global::vector;
 
 	void init_cuda_device();
 

@@ -7,10 +7,6 @@
 
 #include "../global/global.h"
 
-using float_f = global::float_t;
-using float_ptr = std::unique_ptr<float_f[]>;
-using complex = std::complex<float_f>;
-
 //cuda错误代码检查
 #define CHECK_CUDA_ERROR(err)\
 	if(err!=cudaSuccess)\
@@ -24,11 +20,19 @@ using complex = std::complex<float_f>;
 //对err进行错误检查，需定义err为cudaError_t
 #define CHECK CHECK_CUDA_ERROR(err)
 
-//复制host内存内容到device中
 namespace gpu
 {
 	using float_t = global::float_t;
+	using float_ptr=std::unique_ptr<float_t[]>;
+	using vector=global::vector;
 
+	/**
+	 * \brief 复制host内存内容到device
+	 * \tparam T 数据类型
+	 * \param host host内存
+	 * \param device device内存
+	 * \param size 数据长度
+	 */
 	template <typename T>
 	void copy_to_device(const T* host, T* device, size_t size)
 	{
@@ -36,7 +40,14 @@ namespace gpu
 		CHECK
 	}
 
-	//复制device显存内容到host中
+	//
+	/**
+	 * \brief 复制device内容到host
+	 * \tparam T 数据类型
+	 * \param host host内存
+	 * \param device device内存
+	 * \param size 数据长度
+	 */
 	template <typename T>
 	void copy_to_host(T* device, T* host, size_t size)
 	{

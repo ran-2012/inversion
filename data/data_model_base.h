@@ -20,12 +20,12 @@ class data_model_base
 protected:
 	using float_t = global::float_t;
 	using string = std::string;
-	using vector = std::vector<float_t>;
+	using vector = global::vector;
 	using size_type = vector::size_type;
 	using json = nlohmann::json;
 
 	static constexpr char index_name[] = "idx";
-	static constexpr char default_version[] = "0.1.0";
+	static constexpr char default_version[] = "0.3.1";
 	static constexpr char default_comment[] = "";
 
 	static void throw_critical_data_miss_exception(const string& data_name)

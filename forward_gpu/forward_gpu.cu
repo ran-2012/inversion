@@ -74,16 +74,19 @@ namespace gpu
 		return ret;
 	}
 
-	//计算正演kernel函数
-	//a: float_t，回线半径(m)
-	//i0: float_t，发射电流(A)
-	//h: float_t，发射、接收回线高度(m)
-	//cosine: device_array，余弦变换系数
-	//hankel: device_array，汉克尔变换系数
-	//resistivity: device_array，地层电阻率
-	//height: device_array，地层厚度
-	//time: device_array，时间
-	//response: device_array，输出响应
+	/**
+	 * \brief 计算正演kernel函数
+	 * \param a 回线半径(m)
+	 * \param i0 发射电流(A)
+	 * \param h 发射、接收回线高度(m)
+	 * \param cosine 余弦变换系数
+	 * \param hankel 汉克尔变换系数
+	 * \param resistivity 地层电阻率
+	 * \param height 地层厚度
+	 * \param time 时间
+	 * \param response_late_m 晚期磁场响应
+	 * \param response_late_e 晚期电场响应
+	 */
 	__global__ void forward_kernel(float_t a, float_t i0, float_t h,
 	                               device_array* cosine,
 	                               device_array* hankel,
@@ -131,8 +134,8 @@ namespace gpu
 			const float_t dHz = sqrt(2 / pi) / t * res_complex[0];
 
 			if (response_late_m)
-				response_late_m->get()[time_idx] = mu0 * pow(pi * i0 * std::pow(a, 2) / 30 / abs(dHz), 2.0 / 3) / pi /
-					t;
+				response_late_m->get()[time_idx] =
+					mu0 * pow(pi * i0 * pow(a, 2) / 30 / abs(dHz), 2.0 / 3) / pi / t;
 		}
 	}
 
@@ -201,8 +204,6 @@ namespace gpu
 
 		device_array late_m_d(time.size());
 		device_array late_e_d(time.size());
-
-
 
 
 		late_m_d.save_data(response_late_m);
