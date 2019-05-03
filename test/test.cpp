@@ -50,24 +50,21 @@ void forward_test()
 	LOG("forward_test start");
 
 	global::scoped_timer timer("forward_test");
-	
+
 	filter_coefficient coef;
-geoelectric_model geo;
+	geoelectric_model geo;
 
-coef.load_cos_coef("cos.txt");
- coef.load_hkl_coef("hkl.txt");
+	coef.load_cos_coef("cos.txt");
+	coef.load_hkl_coef("hkl.txt");
 
- geo.load_from_file("geo.json");
+	geo.load_from_file("geo.json");
 
- f.load_filter_coef(coef);
- f.load_geo_model(geo);
 	LOG("forward_test end");
 }
 
 int main()
 {
 	data_test();
-
 
 
 	return 0;

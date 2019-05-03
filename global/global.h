@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iostream>
 
-#define LOG(msg) global::log(__FUNCTIONW__, msg)
+#define LOG(msg) global::log(__FUNCTION__, msg)
 
 namespace global
 {

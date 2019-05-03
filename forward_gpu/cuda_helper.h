@@ -1,21 +1,20 @@
 ﻿#pragma once
 
 #include <sstream>
-#include <complex>
 
 #include <cuda_runtime.h>
 
 #include "../global/global.h"
 
 //cuda错误代码检查
-#define CHECK_CUDA_ERROR(err)\
-	if(err!=cudaSuccess)\
-	{\
-		std::stringstream msg;\
-		msg << "cuda error: \n";\
-		msg << cudaGetErrorName(err) << '\n';\
-		msg << "at line: " << __LINE__;\
-		throw std::runtime_error(msg.str());\
+#define CHECK_CUDA_ERROR(err)					\
+	if(err!=cudaSuccess)						\
+	{											\
+		std::stringstream msg;					\
+		msg << "cuda error: \n";				\
+		msg << cudaGetErrorName(err) << '\n';	\
+		msg << "at line: " << __LINE__;			\
+		throw std::runtime_error(msg.str());	\
 	}
 //对err进行错误检查，需定义err为cudaError_t
 #define CHECK CHECK_CUDA_ERROR(err)

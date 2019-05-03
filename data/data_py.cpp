@@ -2,7 +2,6 @@
 #include <pybind11/pybind11.h>
 
 #include "data.h"
-#include "../global/global.h"
 
 namespace py = pybind11;
 
@@ -10,9 +9,6 @@ PYBIND11_MODULE(data_py, m)
 {
 	m.doc() = "正反演程序中所需的基本数据结构及全局数据";
 	m.def("test_func", []() {return "hello world!"; }, "测试函数");
-
-	//float type used in forwarding process
-	using float_t=global::float_t;
 
 	//data_model_base
 	auto b = py::class_<data_model_base>(m, "data_model_base");

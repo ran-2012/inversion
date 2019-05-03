@@ -97,7 +97,7 @@ namespace gpu
 	                               device_array* response_late_e)
 	{
 		const int time_idx = blockIdx.x;
-		const int time_num = blockDim.x;
+		const int cosine_num = blockDim.x;
 		const int cosine_idx = threadIdx.x;
 
 		extern __shared__ float_t res_complex[];
@@ -119,11 +119,11 @@ namespace gpu
 		res_complex[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
 
 		//二分求和
-		for (int offset = time_num / 2; offset > 0; offset >>= 1)
+		for (int offset = cosine_num / 2; offset > 0; offset >>= 1)
 		{
-			if (time_idx < offset)
+			if (cosine_idx < offset)
 			{
-				res_complex[time_idx] += res_complex[time_idx + offset];
+				res_complex[cosine_idx] += res_complex[cosine_idx + offset];
 			}
 			__syncthreads();
 		}
@@ -190,7 +190,8 @@ namespace gpu
 		global::log("test_cuda_device", "test end");
 	}
 
-	void forward(const vector& cosine, const vector& hankel,
+	void forward(float_t a, float_t i0, float_t h,
+	             const vector& cosine, const vector& hankel,
 	             const vector& resistivity, const vector& height,
 	             const vector& time,
 	             vector& response_late_m, vector& response_late_e)
@@ -205,6 +206,12 @@ namespace gpu
 		device_array late_m_d(time.size());
 		device_array late_e_d(time.size());
 
+		forward_kernel << <time_d.size(), cosine_d.size(), sizeof(float_t) * cosine_d.size() >> >(
+			a, i0, h,
+			cosine_d.get_device_ptr(), hankel_d.get_device_ptr(),
+			res_d.get_device_ptr(), height_d.get_device_ptr(),
+			time_d.get_device_ptr(),
+			late_m_d.get_device_ptr(), late_e_d.get_device_ptr());
 
 		late_m_d.save_data(response_late_m);
 		late_e_d.save_data(response_late_e);

@@ -17,7 +17,7 @@ PYBIND11_MODULE(forward_py, m)
 	f.def(py::init<>());
 	f.def("load_geo_model", &forward_gpu::load_geo_model);
 	f.def("load_filter_coef", &forward_gpu::load_filter_coef);
-	f.def("load_forward_data", &forward_gpu::load_forward_data);
+	f.def("load_time_stamp", &forward_gpu::load_time_stamp);
 
 	f.def("forward", &forward_gpu::forward);
 }
