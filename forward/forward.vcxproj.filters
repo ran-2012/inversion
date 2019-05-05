@@ -23,8 +23,5 @@
     <ClCompile Include="forward_py.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="forward.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

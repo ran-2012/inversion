@@ -44,6 +44,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj",
 		{6F809EA3-E948-4702-BD89-26E430A8E598} = {6F809EA3-E948-4702-BD89-26E430A8E598}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "matlab", "matlab", "{AC409790-F015-4C2D-B0A7-CD3A78ECFEF5}"
+	ProjectSection(SolutionItems) = preProject
+		Foward1D_Center\ATEM_1D_Hz.m = Foward1D_Center\ATEM_1D_Hz.m
+		Foward1D_Center\cos_xs.txt = Foward1D_Center\cos_xs.txt
+		Foward1D_Center\hankel0.txt = Foward1D_Center\hankel0.txt
+		Foward1D_Center\hankel1.txt = Foward1D_Center\hankel1.txt
+		Foward1D_Center\Return_dHz_w.m = Foward1D_Center\Return_dHz_w.m
+		Foward1D_Center\Return_Hz_t.m = Foward1D_Center\Return_Hz_t.m
+		Foward1D_Center\sin_xs.txt = Foward1D_Center\sin_xs.txt
+		Foward1D_Center\zhengxian.txt = Foward1D_Center\zhengxian.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

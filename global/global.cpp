@@ -24,10 +24,8 @@ namespace global
 				msg << tag << " | " << content << "\n";
 #if defined(_MSC_VER) && defined(_DEBUG)
 				OutputDebugString(msg.str().c_str());
-#else
-				std::clog << msg.str() << std::flush;
 #endif
-
+				std::clog << msg.str() << std::flush;
 			}
 			catch (std::exception& e)
 			{
@@ -39,28 +37,35 @@ namespace global
 		{
 			using clock = std::chrono::steady_clock;
 			using time_point = std::chrono::time_point<std::chrono::steady_clock>;
-			using duration=std::chrono::milliseconds;
+			using duration = std::chrono::milliseconds;
 
 			clock clk;
 			time_point begin;
 			std::string name;
 
 		public:
-			_scoped_timer(std::string n = std::string()) 
+			_scoped_timer(std::string n = std::string())
 			{
 				name = n;
 				begin = clk.now();
 			}
 
-			~_scoped_timer()
+			~_scoped_timer() noexcept
 			{
-				time_point end = clk.now();
-				auto t = std::chrono::duration_cast<duration>(end - begin).count()/1000;
+				try
+				{
+					time_point end = clk.now();
+					auto t = std::chrono::duration_cast<duration>(end - begin).count() / 1000;
 
-				std::stringstream msg;
-				msg << name << " executed in " << t << "ms";
+					std::stringstream msg;
+					msg << name << " executed in " << t << "ms";
 
-				log("timer", msg.str());
+					log("timer", msg.str());
+				}
+				catch(std::exception& e)
+				{
+					log("timer", "error encountered while terminating");
+				}
 			}
 		};
 	}
@@ -83,5 +88,4 @@ namespace global
 		time << std::put_time(localtime(&now_c), "%Y-%m-%d %H:%M:%S");
 		return time.str();
 	}
-
 }

@@ -53,9 +53,17 @@ namespace gpu
 
 		__host__ void load_data(const vector& vec)
 		{
-			device_mem.release();
 			device_mem.allocate(vec.size());
+			device_mem_size = vec.size();
 			copy_to_device(vec.data(), device_mem.get(), device_mem_size);
+			allocate_device_this_ptr();
+		}
+
+		__host__ void allocate(size_t size)
+		{
+			device_mem.allocate(size);
+			device_mem_size = size;
+			allocate_device_this_ptr();
 		}
 
 		/**
@@ -69,7 +77,6 @@ namespace gpu
 
 			copy_to_host(device_mem.get(), host_mem.get(), device_mem_size);
 
-			vec.clear();
 			vec.resize(size());
 			for (auto i = 0; i < device_mem_size; ++i)
 			{
@@ -77,8 +84,8 @@ namespace gpu
 			}
 		}
 
-		//访问数据指针，仅kernel中可访问
-		__device__ float_t* get() const
+		//访问数据指针
+		__host__ __device__ float_t* get() const
 		{
 			return device_mem.get();
 		}
@@ -90,7 +97,7 @@ namespace gpu
 			return device_mem.get()[idx];
 		}
 
-		//获取大小，仅kernel中可访问
+		//获取大小
 		__host__ __device__ size_t size() const
 		{
 			return device_mem_size;

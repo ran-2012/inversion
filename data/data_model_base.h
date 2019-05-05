@@ -164,7 +164,7 @@ public:
 		return _data_content_name()[idx];
 	}
 
-	virtual size_type get_name_idx(const string& name)
+	virtual size_type get_name_idx(const string& name) const
 	{
 		return 0;
 	}
@@ -181,9 +181,14 @@ public:
 		return *this;
 	}
 
-	virtual vector& get_item(size_type id)
+	virtual const vector& get_item(size_type id) const
 	{
 		return data[id];
+	}
+
+	virtual const vector& get_item(const string& name) const
+	{
+		return data[get_name_idx(name)];
 	}
 
 	virtual vector& operator[](size_type id)

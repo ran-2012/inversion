@@ -15,9 +15,9 @@ public:
 	constexpr static float_t threshold = 1e-5;
 
 protected:
-	float_t a;
-	float_t i0;
-	float_t h;
+	float_t a = 10;
+	float_t i0 = 1;
+	float_t h = 0;
 
 	filter_coefficient filter;
 	geoelectric_model geomodel;
@@ -34,23 +34,31 @@ protected:
 public:
 	forward_base() = default;
 
+	forward_base(const forward_base& f) = default;
+	forward_base(forward_base&& f) = default;
+
 	virtual ~forward_base() = default;
 
 	forward_base& operator=(const forward_base& f) = default;
+	forward_base& operator=(forward_base&& f) = default;
 
-	virtual void load_general_param(const vector& v)
+	virtual void load_general_params(float_t a, float_t i0, float_t h)
 	{
-		a = v[0];
-		i0 = v[1];
-		h = v[2];
+		this->a = a;
+		this->i0 = i0;
+		this->h = h;
 	}
+
+	virtual void load_general_params(const vector& v) { load_general_params(v[0], v[1], v[2]); }
+
 	virtual void load_filter_coef(const filter_coefficient& coef) final { filter = coef; }
-
 	virtual void load_geo_model(const geoelectric_model& mod) final { geomodel = mod; }
-
 	virtual void load_time_stamp(const forward_data& data) final { time_stamp = data; }
 
 	virtual void forward() = 0;
+
+	virtual forward_data get_result_late_m() { return data_late_m; }
+	virtual forward_data get_result_late_e() { return data_late_e; }
 };
 
 class forward_gpu final : public forward_base
@@ -61,8 +69,66 @@ public:
 
 	forward_gpu& operator=(const forward_gpu& f) = default;
 
-	static void init_cuda_device();
-	static void test_cuda_device();
+	/**
+	 * \brief 初始化CUDA设备
+	 */
+	static void init_cuda_device()
+	{
+		try
+		{
+			gpu::init_cuda_device();
+		}
+		catch (std::exception& e)
+		{
+			global::err(e.what());
+			global::err("init cuda device failed");
+		}
+	}
 
-	void forward() override;
+	/**
+	 * \brief 测试CUDA设备
+	 */
+	static void test_cuda_device()
+	{
+		try
+		{
+			gpu::test_cuda_device();
+		}
+		catch (std::exception& e)
+		{
+			global::err(e.what());
+			global::err("test cuda device failed");
+		}
+	}
+
+	/**
+	 * \brief 正演
+	 */
+	void forward() override
+	{
+		assert(geomodel.size());
+		assert(check_coef());
+
+		if (time_stamp.size() == 0)
+		{
+			time_stamp.generate_default_time_stamp();
+		}
+
+		data_late_m = time_stamp;
+		data_late_e = time_stamp;
+
+		try
+		{
+			gpu::forward(a, i0, h,
+			             filter.get_cos(), filter.get_hkl(),
+			             geomodel["resistivity"], geomodel["height"],
+			             time_stamp["time"],
+			             data_late_m["response"], data_late_e["response"]);
+		}
+		catch (std::exception& e)
+		{
+			global::err(e.what());
+			global::err("forward failed");
+		}
+	}
 };

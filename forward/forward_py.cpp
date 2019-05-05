@@ -1,4 +1,8 @@
-﻿#include <exception>
+﻿#pragma comment(lib, "global.lib")
+#pragma comment(lib, "forward_gpu.lib")
+#pragma comment(lib, "cudart_static.lib")
+
+#include <exception>
 
 #include <pybind11/pybind11.h>
 

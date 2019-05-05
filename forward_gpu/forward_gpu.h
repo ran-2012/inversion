@@ -13,6 +13,19 @@ namespace gpu
 
 	void test_cuda_device();
 
+	/**
+	 * \brief 计算正演kernel函数
+	 * \param a 回线半径(m)
+	 * \param i0 发射电流(A)
+	 * \param h 发射、接收回线高度(m)
+	 * \param cosine 余弦变换系数
+	 * \param hankel 汉克尔变换系数
+	 * \param resistivity 地层电阻率
+	 * \param height 地层厚度
+	 * \param time 时间
+	 * \param response_late_m 晚期磁场响应
+	 * \param response_late_e 晚期电场响应
+	 */
 	void forward(float_t a, float_t i0, float_t h,
 	             const vector& consine, const vector& hankel,
 	             const vector& resistivity, const vector& height,

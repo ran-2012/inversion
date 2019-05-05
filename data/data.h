@@ -41,7 +41,7 @@ public:
 
 	virtual ~forward_data() = default;
 
-	size_type get_name_idx(const string& name) override
+	size_type get_name_idx(const string& name) const override
 	{
 		if (name == string(index_name))
 			return 0;
@@ -141,13 +141,18 @@ public:
 
 	virtual ~isometric_model() = default;
 
-	size_type get_name_idx(const string& name) override
+	size_type get_name_idx(const string& name) const override
 	{
 		if (name == string(index_name))
 			return 0;
 		if (name == string(second_name))
 			return 1;
 		throw std::out_of_range("下标错误");
+	}
+
+	float_t get_height() const
+	{
+		return layer_height;
 	}
 
 	isometric_model& operator=(const isometric_model& g)
@@ -198,7 +203,7 @@ public:
 
 	virtual ~geoelectric_model() = default;
 
-	size_type get_name_idx(const string& name) override
+	size_type get_name_idx(const string& name) const override
 	{
 		if (name == string(index_name))
 			return 0;
@@ -224,6 +229,12 @@ public:
 		{
 			item.resize(i.size());
 		}
+
+		//convert isometric model to geoelectric model
+		data[0] = i.get_item(index_name);
+		data[1] = vector(i.size(), i.get_height());
+		data[2] = i.get_item(2);
+
 		return *this;
 	}
 

@@ -17,14 +17,21 @@ namespace gpu
 	__device__ const float_t mu0 = global::mu0;
 	__device__ const float_t pi = global::pi;
 
-	__global__ void test_device_kernel(float_t* a, float_t* b, float_t* c, int num)
+	__global__ void test_device_kernel(device_array* a, device_array* b, device_array* c)
 	{
 		int i = threadIdx.x;
-		if (i >= num)
+		int n = a->size();
+
+		auto da = a->get();
+		auto db = b->get();
+		auto dc = c->get();
+
+		if (i >= n)
 		{
 			return;
 		}
-		c[i] = a[i] * b[i];
+		printf("%f = %f * %f", dc[i], da[i], db[i]);
+		dc[i] = da[i] * db[i];
 	}
 
 	__device__ thrust::complex<float_t> return_dHz_w(float_t a, float_t i0, float_t h,
@@ -100,7 +107,7 @@ namespace gpu
 		const int cosine_num = blockDim.x;
 		const int cosine_idx = threadIdx.x;
 
-		extern __shared__ float_t res_complex[];
+		extern __shared__ float_t res[];
 		__shared__ float_t t;
 		__shared__ float_t* cosine_ptr;
 
@@ -116,14 +123,14 @@ namespace gpu
 		float_t w = 1 / t * exp((-150 + cosine_idx - 1) * std::log(10.0) / 20);
 		thrust::complex<float_t> hz_w = return_dHz_w(a, i0, h, hankel, resistivity, height, w);
 
-		res_complex[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
+		res[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
 
 		//二分求和
 		for (int offset = cosine_num / 2; offset > 0; offset >>= 1)
 		{
 			if (cosine_idx < offset)
 			{
-				res_complex[cosine_idx] += res_complex[cosine_idx + offset];
+				res[cosine_idx] += res[cosine_idx + offset];
 			}
 			__syncthreads();
 		}
@@ -131,7 +138,7 @@ namespace gpu
 		//每个block中的第一个线程做收尾计算
 		if (cosine_idx == 0)
 		{
-			const float_t dHz = sqrt(2 / pi) / t * res_complex[0];
+			const float_t dHz = sqrt(2 / pi) / t * res[0];
 
 			if (response_late_m)
 				response_late_m->get()[time_idx] =
@@ -149,34 +156,32 @@ namespace gpu
 
 	void test_cuda_device()
 	{
-		global::scoped_timer("test_cuda");
+		global::scoped_timer timer("test_cuda");
 
 		global::log("test_cuda_device", "test start");
 
-		device_ptr<float_t> da;
-		device_ptr<float_t> db;
-		device_ptr<float_t> dc;
+		device_array da;
+		device_array db;
+		device_array dc;
 
-		float_t a[] = {1, 2, 3, 4, 5};
-		float_t b[] = {1, 2, 3, 4, 5};
+		vector a = {1, 2, 3, 4, 5};
+		vector b = {1, 2, 3, 4, 5};
+		vector c;
 
-		auto size = sizeof(a) / sizeof(float_t);
-		float_ptr c(new float_t[size]);
+		const auto size =  a.size();
 
-		da.allocate(size);
-		db.allocate(size);
+		da.load_data(a);
+		db.load_data(b);
+
 		dc.allocate(size);
-
-		copy_to_device(a, da.get(), size);
-		copy_to_device(b, db.get(), size);
 
 		global::log("test_cuda_device", "calculate start");
 
-		test_device_kernel << <1, 32 >> >(da.get(), db.get(), dc.get(), size);
+		test_device_kernel << <1, 32 >> >(da.get_device_ptr(), db.get_device_ptr(), dc.get_device_ptr());
 		auto err = cudaDeviceSynchronize();
 		CHECK;
 
-		copy_to_host(dc.get(), c.get(), size);
+		dc.save_data(c);
 
 		global::log("test_cuda_device", "calculate end");
 
