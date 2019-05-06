@@ -18,15 +18,14 @@ void data_test()
 	LOG("data_test start");
 
 	isometric_model g;
+	geoelectric_model m;
 
 	std::string tag("data test");
 
-	global::log(tag, "begin data test");
-
 	g.load_from_file("../data_load_test.json");
 	g.save_to_file("../save_test.json");
-
-	global::log(tag, "end data test");
+	m = g;
+	m.save_to_file(("../save_text2.json"));
 
 	LOG("data_test end");
 }
@@ -86,6 +85,7 @@ int main()
 {
 	data_test();
 	cuda_test();
+	forward_test();
 
 	return 0;
 }

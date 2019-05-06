@@ -1,17 +1,18 @@
 {
-    "comment": "this is test data",
-    "count": 2,
+    "comment": "",
+    "count": 0,
     "data": [
         {
+            "height": 10.0,
             "idx": 1.0,
             "resistivity": 100.0
         },
         {
+            "height": 10.0,
             "idx": 2.0,
             "resistivity": 200.0
         }
     ],
-    "layer_height": 10.0,
-    "name": "test",
+    "name": "",
     "version": "0.3.1"
 }

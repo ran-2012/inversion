@@ -92,8 +92,6 @@ namespace gpu
 	 * \param height 地层厚度
 	 * \param time 时间
 	 * \param b 正演磁场强度
-	 * \param response_late_m 晚期磁场响应
-	 * \param response_late_e 晚期电场响应
 	 */
 	__global__ void forward_kernel(float_t a, float_t i0, float_t h,
 	                               device_array* cosine,
@@ -101,11 +99,8 @@ namespace gpu
 	                               device_array* resistivity,
 	                               device_array* height,
 	                               device_array* time,
-	                               device_array* b,
-	                               device_array* response_late_m,
-	                               device_array* response_late_e)
+	                               device_array* b)
 	{
-		const int time_num = gridDim.x;
 		const int time_idx = blockIdx.x;
 		const int cosine_num = blockDim.x;
 		const int cosine_idx = threadIdx.x;
@@ -128,51 +123,60 @@ namespace gpu
 
 		res[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
 
-		int num = cosine_num;
+		int sum_num = cosine_num;
 		//二分求和
-		for (int offset = cosine_num / 2; offset > 0; offset >>= 1)
+		while (sum_num > 0)
 		{
+			int idx = cosine_idx;
+			int next_sum_num = sum_num / 2;
+
+			//求和个数为奇数时会有一个多出来的元素
+			if (sum_num | 0x1)
+			{
+				++idx;
+				++next_sum_num;
+			}
+			const int offset = sum_num / 2;
 			if (cosine_idx < offset)
 			{
-				res[cosine_idx] += res[cosine_idx + offset];
+				res[idx] += res[idx + offset];
 			}
-			__syncthreads();
-			if (num | 0x1 && num > 1)
-			{
-				if (cosine_idx == 0)
-				{
-					res[cosine_idx] += res[num - 1];
-				}
-				num /= 2;
-			}
+			sum_num = next_sum_num;
 			__syncthreads();
 		}
 
-		volatile auto* b_d = b->get();
 		//保存正演结果磁场强度到全局显存
 		if (cosine_idx == 0)
 		{
-			b_d[time_idx] = res[0];
-		}
-		//每个block中的第个线程做收尾计算
-		if (cosine_idx == 0)
-		{
-			const float_t dHz = sqrt(2 / pi) / t * res[0];
-
-			response_late_m->get()[time_idx] =
-				mu0 * pow(pi * i0 * pow(a, 2) / 30 / abs(dHz), 2.0 / 3) / pi / t;
+			b->get()[time_idx] = res[0];
 		}
 	}
 
-	__global__ void calc_late_e_kernel(float_t a, float_t i0, float_t h,
-	                                   device_array* b,
-	                                   device_array* time,
-	                                   device_array* response_late_e)
+	/**
+	 * \brief 计算响应kernel函数
+	 * \param a 回线半径(m)
+	 * \param i0 发射电流(A)
+	 * \param h 发射、接收回线高度(m)
+	 * \param b 磁场
+	 * \param time 时间
+	 * \param response_late_m 晚期磁场响应
+	 * \param response_late_e 晚期电场响应
+	 */
+	__global__ void calc_response_kernel(float_t a, float_t i0, float_t h,
+	                                     device_array* b,
+	                                     device_array* time,
+	                                     device_array* response_late_m,
+	                                     device_array* response_late_e)
 	{
 		const int time_idx = threadIdx.x;
 
 		const auto b_d = b->get();
 		const auto t = time->get()[time_idx];
+
+		const float_t dHz = sqrt(2 / pi) / t * b_d[time_idx];
+
+		response_late_m->get()[time_idx] =
+			mu0 * pow(pi * i0 * pow(a, 2) / 30 / abs(dHz), 2.0 / 3) / pi / t;
 
 		const auto t1 = time->get()[time_idx + 1];
 		const auto t2 = (t + t1) / 2;
@@ -252,16 +256,16 @@ namespace gpu
 			a, i0, h,
 			cosine_d.get_device_ptr(), hankel_d.get_device_ptr(),
 			res_d.get_device_ptr(), height_d.get_device_ptr(),
-			time_d.get_device_ptr(), b.get_device_ptr(),
-			late_m_d.get_device_ptr(), late_e_d.get_device_ptr());
+			time_d.get_device_ptr(), b.get_device_ptr());
 		auto err = cudaDeviceSynchronize();
 		CHECK;
 
-		calc_late_e_kernel << <1, time_d.size() >> > (
+		calc_response_kernel << <1, time_d.size() >> >(
 			a, i0, h,
 			time_d.get_device_ptr(),
 			b.get_device_ptr(),
-			late_e_d.get_device_ptr());
+			late_e_d.get_device_ptr(),
+			late_m_d.get_device_ptr());
 		err = cudaDeviceSynchronize();
 		CHECK;
 

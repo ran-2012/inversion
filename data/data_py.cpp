@@ -17,7 +17,7 @@ PYBIND11_MODULE(data_py, m)
 	b.def_readwrite("version", &data_model_base::version);
 	b.def_readwrite("comment", &data_model_base::comment);
 
-	b.def("__getitem__", static_cast<std::vector<float_t> & (data_model_base:: * )(size_t)>(&data_model_base::get_item));
+	b.def("__getitem__", &data_model_base::get_item_s);
 	b.def("__setitem__", &data_model_base::set_item);
 	b.def("get_content_name", &data_model_base::get_content_name);
 	b.def_property_readonly("count", &data_model_base::size);
@@ -28,7 +28,7 @@ PYBIND11_MODULE(data_py, m)
 	b.def("save_to_file", &data_model_base::save_to_file);
 
 	//geoelectric_model
-	auto g = py::class_<geoelectric_model>(m, "geoelectric_model");
+	auto g = py::class_<geoelectric_model>(m, "geoelectric_model", b);
 	g.doc() = "等距地电模型";
 
 	g.def(py::init<>());

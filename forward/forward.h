@@ -4,6 +4,7 @@
 
 #include "../data/data.h"
 #include "../global/global.h"
+#include "../forward_gpu/forward_gpu.h"
 
 class forward_base
 {
@@ -47,6 +48,11 @@ public:
 		this->a = a;
 		this->i0 = i0;
 		this->h = h;
+	}
+
+	virtual void load_general_params_s(float_t a, float_t i0, float_t h)
+	{
+		load_general_params(a, i0, h);
 	}
 
 	virtual void load_general_params(const vector& v) { load_general_params(v[0], v[1], v[2]); }

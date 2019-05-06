@@ -101,7 +101,7 @@ protected:
 			for (auto& item_j : data_j)
 			{
 				size_type idx = static_cast<size_type>(std::round(item_j[index_name].get<float_t>() - 1));
-				for (size_type i = 1; i < _data_content_count(); ++i)
+				for (size_type i = 0; i < _data_content_count(); ++i)
 				{
 					auto temp = item_j[data_names[i]].get<float_t>();
 					data[i][idx] = temp;
@@ -129,7 +129,7 @@ protected:
 	{
 	}
 
-	virtual json save_additional_data() { return json(); }
+	virtual json save_additional_data() { return json(R"({})"); }
 
 public:
 	string version;
@@ -189,6 +189,11 @@ public:
 	virtual const vector& get_item(const string& name) const
 	{
 		return data[get_name_idx(name)];
+	}
+
+	virtual const vector& get_item_s(const string& name) const
+	{
+		return get_item(name);
 	}
 
 	virtual vector& operator[](size_type id)
@@ -311,7 +316,10 @@ public:
 		j[_data()] = std::move(data_j);
 
 		json patch_j = save_additional_data();
-		j.merge_patch(patch_j);
+		if (!patch_j.is_null())
+		{
+			j.merge_patch(patch_j);
+		}
 		return j;
 	}
 };

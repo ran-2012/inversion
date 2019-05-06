@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "data_model_base.h"
-#include "../forward_gpu/forward_gpu.h"
 
 //正演数据
 class forward_data;
@@ -68,7 +67,7 @@ public:
 
 	void generate_time_stamp(float_t exponent_1, float_t exponent_2, float_t interval)
 	{
-		assert(exponent_1 >= exponent_2);
+		assert(exponent_1>=exponent_2);
 
 		const auto count = 1 + static_cast<size_t>(std::floor((exponent_2 - exponent_1) / interval));
 
@@ -189,13 +188,9 @@ class geoelectric_model : public data_model_base
 
 public:
 
-	geoelectric_model() : data_model_base()
-	{
-	}
+	geoelectric_model() = default;
 
-	geoelectric_model(const geoelectric_model& f) : data_model_base(f)
-	{
-	}
+	geoelectric_model(const geoelectric_model& f) = default;
 
 	geoelectric_model(geoelectric_model&& f) noexcept : data_model_base(std::move(f))
 	{
@@ -214,15 +209,12 @@ public:
 		throw std::out_of_range("下标错误");
 	}
 
-	geoelectric_model& operator=(const geoelectric_model& f)
-	{
-		this->data_model_base::operator=(f);
-
-		return *this;
-	}
+	geoelectric_model& operator=(const geoelectric_model& f) = default;
 
 	geoelectric_model& operator=(const isometric_model& i)
 	{
+		this->data_model_base::operator=(i);
+
 		this->data.clear();
 		this->data.resize(this->_data_content_count());
 		for (auto& item : this->data)
@@ -233,7 +225,7 @@ public:
 		//convert isometric model to geoelectric model
 		data[0] = i.get_item(index_name);
 		data[1] = vector(i.size(), i.get_height());
-		data[2] = i.get_item(2);
+		data[2] = i.get_item(1);
 
 		return *this;
 	}
