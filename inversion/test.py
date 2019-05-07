@@ -1,21 +1,26 @@
 ﻿
-import data_py
 import os
+import data_py
 
 def test_main():
-	print(u'呃')
-	print(data_py.test_func())
-	d=data_py.geoelectric_model()
-	d.load_from_file("../data_load_test.json")
-	print(d.count)
-	for i in range(d.count):
-		print(d[i])
-	print(d.version)
+	try:
+		print(u'呃')
+		print(data_py.test_func())
+		a=data_py.vec_test_func()
+		d=data_py.isometric_model()
+		d.load_from_file("../data_load_test.json")
+		print(d.count)
+		for i in range(d.count):
+			print(d['idx'][i])
+		print(d.version)
 
-	print(d[0])
-	d[0]=(0,0)
-	print(d[0])
-	print(d.count)
-	
+		d2=data_py.geoelectric_model()
+		d2=d
+		d2.save_to_file('../data_save_test_geo.json')
 
+	except e:
+		print('error')
+	finally:
+		input()
 test_main()
+

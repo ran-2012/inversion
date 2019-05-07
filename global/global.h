@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include <vector>
 #include <string>
@@ -16,14 +16,14 @@ namespace global
 
 	std::string current_time();
 
-	//å°†å¤šä¸ªå˜é‡åˆå¹¶ä¸ºå­—ç¬¦ä¸²
+	//½«¶à¸ö±äÁ¿ºÏ²¢Îª×Ö·û´®
 	template <typename T>
 	std::string msg(const T& t)
 	{
 		return std::string(t);
 	}
 
-	//å°†å¤šä¸ªå˜é‡åˆå¹¶ä¸ºå­—ç¬¦ä¸²
+	//½«¶à¸ö±äÁ¿ºÏ²¢Îª×Ö·û´®
 	template <typename T, typename ...Args>
 	std::string msg(const T& t, const Args&...args)
 	{
@@ -31,14 +31,14 @@ namespace global
 		return ss + msg(args...);
 	}
 
-	//è¾“å‡ºé”™è¯¯ä¿¡æ¯åˆ°std::cerr
+	//Êä³ö´íÎóĞÅÏ¢µ½std::cerr
 	template <typename...Args>
 	void err(const Args& ...args)
 	{
 		std::cerr << msg(args...) << std::endl;
 	}
 
-	//è¾“å‡ºæ—¥å¿—åˆ°è¾“å‡ºçª—å£ï¼Œç±»å‹Tä¸Uå¿…é¡»å¯åºåˆ—åŒ–
+	//Êä³öÈÕÖ¾µ½Êä³ö´°¿Ú£¬ÀàĞÍTÓëU±ØĞë¿ÉĞòÁĞ»¯
 	template <typename T, typename ...Args>
 	void log(const T& tag, const Args& ...content) noexcept
 	{
@@ -52,7 +52,7 @@ namespace global
 		}
 	}
 
-	//ä½œç”¨åŸŸè®¡æ—¶å™¨ï¼Œé€€å‡ºä½œç”¨åŸŸæ—¶è¾“å‡ºæ—¶é—´
+	//×÷ÓÃÓò¼ÆÊ±Æ÷£¬ÍË³ö×÷ÓÃÓòÊ±Êä³öÊ±¼ä
 	class scoped_timer
 	{
 	private:
@@ -66,7 +66,7 @@ namespace global
 
 namespace global
 {
-	//è®¡ç®—è¿‡ç¨‹ä¸­ä½¿ç”¨çš„æµ®ç‚¹ç±»å‹
+	//¼ÆËã¹ı³ÌÖĞÊ¹ÓÃµÄ¸¡µãÀàĞÍ
 	using float_t = double;
 
 	using vector=std::vector<float_t>;

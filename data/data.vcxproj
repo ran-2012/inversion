@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="data.h" />
     <ClInclude Include="data_model_base.h" />
+    <ClInclude Include="global.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
