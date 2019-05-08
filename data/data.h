@@ -28,7 +28,9 @@ class forward_data final : public data_model_base
 
 public:
 
-	forward_data() = default;
+	forward_data() : data_model_base()
+	{
+	}
 
 	forward_data(const forward_data& f) : data_model_base(f)
 	{
@@ -67,10 +69,9 @@ public:
 
 	void generate_time_stamp(float_t exponent_1, float_t exponent_2, float_t interval)
 	{
-		assert(exponent_1>=exponent_2);
+		count = 1 + static_cast<size_t>(std::floor((exponent_2 - exponent_1) / interval));
 
-		const auto count = 1 + static_cast<size_t>(std::floor((exponent_2 - exponent_1) / interval));
-
+		data.resize(_data_content_count());
 		for (auto& item : data)
 			item.resize(count);
 
@@ -78,14 +79,20 @@ public:
 		{
 			const auto exponent = exponent_1 + i * interval;
 			(*this)[index_name][i] = static_cast<float_t>(i) + 1;
-			(*this)[second_name][i] = exp(exponent / log(10));
+			(*this)[second_name][i] = pow(10, exponent);
 			(*this)[third_name][i] = 0;
 		}
 	}
 
+	void generate_time_stamp_by_count(float_t exponent_1, float_t exponent_2, size_t count)
+	{
+		const auto interval = count > 1 ? (exponent_2 - exponent_1) / (count - 1) : 0;
+		generate_time_stamp(exponent_1, exponent_2, interval);
+	}
+
 	void generate_default_time_stamp()
 	{
-		generate_time_stamp(-5, 3, 0.25);
+		generate_time_stamp_by_count(-5, 0, 40);
 	}
 };
 

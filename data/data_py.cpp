@@ -31,8 +31,8 @@ PYBIND11_MODULE(data_py, m)
 
 	b.def(py::init<>());
 	b.def(py::init<data_model_base>());
-	b.def("load_from_file", &data_model_base::load_from_file);
-	b.def("save_to_file", &data_model_base::save_to_file);
+	b.def("load_from_file", &data_model_base::load_from_file, "load data from json file");
+	b.def("save_to_file", &data_model_base::save_to_file, "save data to json file");
 
 	//geoelectric_model
 	auto g = py::class_<geoelectric_model>(m, "geoelectric_model", b);

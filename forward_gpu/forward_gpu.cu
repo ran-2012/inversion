@@ -30,7 +30,7 @@ namespace gpu
 		{
 			return;
 		}
-		printf("%f = %f * %f", dc[i], da[i], db[i]);
+		printf("%f = %f * %f\n", dc[i], da[i], db[i]);
 		dc[i] = da[i] * db[i];
 	}
 

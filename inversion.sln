@@ -56,6 +56,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "matlab", "matlab", "{AC4097
 		Foward1D_Center\zhengxian.txt = Foward1D_Center\zhengxian.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test_data", "test_data", "{BA29B7E2-7F83-4392-B781-5E1C342F4730}"
+	ProjectSection(SolutionItems) = preProject
+		test_data\cos_xs.txt = test_data\cos_xs.txt
+		test_data\data_load_test.json = test_data\data_load_test.json
+		test_data\data_save_test_geo.json = test_data\data_save_test_geo.json
+		test_data\hankel1.txt = test_data\hankel1.txt
+		test_data\save_test.json = test_data\save_test.json
+		test_data\save_test2.json = test_data\save_test2.json
+		test_data\save_test_forward.json = test_data\save_test_forward.json
+		test_data\test_geo_model.json = test_data\test_geo_model.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

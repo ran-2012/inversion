@@ -6,6 +6,7 @@
 #include <iostream>
 
 #define LOG(msg) global::log(__FUNCTION__, msg)
+#define TIMER(...) global::scoped_timer __t(__FUNCTION__)
 
 namespace global
 {
@@ -20,15 +21,18 @@ namespace global
 	template <typename T>
 	std::string msg(const T& t)
 	{
-		return std::string(t);
+		std::stringstream ss;
+		ss << t;
+		return ss.str();
 	}
 
 	//将多个变量合并为字符串
 	template <typename T, typename ...Args>
 	std::string msg(const T& t, const Args&...args)
 	{
-		std::string ss = t;
-		return ss + msg(args...);
+		std::stringstream ss;
+		ss << t << msg(args...);
+		return ss.str();
 	}
 
 	//输出错误信息到std::cerr

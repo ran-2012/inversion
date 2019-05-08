@@ -16,16 +16,20 @@
 void data_test()
 {
 	LOG("data_test start");
+	TIMER();
 
 	isometric_model g;
 	geoelectric_model m;
+	forward_data f;
 
 	std::string tag("data test");
 
-	g.load_from_file("../data_load_test.json");
-	g.save_to_file("../save_test.json");
+	g.load_from_file("../test_data/data_load_test.json");
+	g.save_to_file("../test_data/save_test.json");
 	m = g;
-	m.save_to_file(("../save_text2.json"));
+	m.save_to_file(("../test_data/save_test2.json"));
+	f.generate_default_time_stamp();
+	f.save_to_file("../test_data/save_test_forward.json");
 
 	LOG("data_test end");
 }
@@ -33,8 +37,7 @@ void data_test()
 void cuda_test()
 {
 	LOG("cuda_test start");
-
-	global::scoped_timer timer("test");
+	TIMER();
 
 	forward_gpu f;
 	forward_gpu::test_cuda_device();
@@ -45,8 +48,7 @@ void cuda_test()
 void forward_test()
 {
 	LOG("forward_test start");
-
-	global::scoped_timer timer("forward_test");
+	TIMER();
 
 	forward_gpu f;
 
@@ -54,10 +56,10 @@ void forward_test()
 	geoelectric_model geo;
 	forward_data data;
 
-	coef.load_cos_coef("cos.txt");
-	coef.load_hkl_coef("hkl.txt");
-	geo.load_from_file("geo.json");
-	data.generate_time_stamp(-6, 0, 40);
+	coef.load_cos_coef("../test_data/cos_xs.txt");
+	coef.load_hkl_coef("../test_data/hankel1.txt");
+	geo.load_from_file("../test_data/test_geo_model.json");
+	data.generate_time_stamp(-6, 0, 0.1);
 
 	f.load_general_params(10, 1, 2);
 	f.load_filter_coef(coef);

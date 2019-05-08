@@ -62,7 +62,7 @@ namespace global
 
 					log("timer", msg.str());
 				}
-				catch(std::exception& e)
+				catch(...)
 				{
 					log("timer", "error encountered while terminating");
 				}

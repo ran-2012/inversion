@@ -22,8 +22,8 @@
 namespace gpu
 {
 	using float_t = global::float_t;
-	using float_ptr=std::unique_ptr<float_t[]>;
-	using vector=global::vector;
+	using float_ptr = std::unique_ptr<float_t[]>;
+	using vector = global::vector;
 
 	/**
 	 * \brief 复制host内存内容到device
@@ -53,4 +53,5 @@ namespace gpu
 		auto err = cudaMemcpy(host, device, size * sizeof(T), cudaMemcpyDeviceToHost);
 		CHECK
 	}
+
 }

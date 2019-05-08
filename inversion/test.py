@@ -18,9 +18,10 @@ def test_main():
 		d2=d
 		d2.save_to_file('../data_save_test_geo.json')
 
-	except e:
+	except Exception as e:
 		print('error')
 	finally:
 		input()
+
 test_main()
 
