@@ -1,7 +1,6 @@
 ﻿
 import os
 import data_py
-import forward_py
 
 def data_test():
 	try:
