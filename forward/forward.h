@@ -112,6 +112,8 @@ public:
 	 */
 	void forward() override
 	{
+		TIMER();
+
 		assert(geomodel.size());
 		assert(check_coef());
 

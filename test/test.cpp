@@ -59,9 +59,9 @@ void forward_test()
 	coef.load_cos_coef("../test_data/cos_xs.txt");
 	coef.load_hkl_coef("../test_data/hankel1.txt");
 	geo.load_from_file("../test_data/test_geo_model.json");
-	data.generate_time_stamp(-6, 0, 0.1);
+	data.generate_time_stamp_by_count(-5, 0, 40);
 
-	f.load_general_params(10, 1, 2);
+	f.load_general_params(10, 100, 50);
 	f.load_filter_coef(coef);
 	f.load_geo_model(geo);
 	f.load_time_stamp(data);

@@ -34,6 +34,36 @@ namespace gpu
 		dc[i] = da[i] * db[i];
 	}
 
+	__global__ void test_sum_kernel(device_array* a)
+	{
+		int idx = threadIdx.x;
+		int num = blockDim.x;
+
+		auto res = a->get();
+
+		int sum_num = num;
+		//二分求和
+		while (sum_num > 1)
+		{
+			int id = idx;
+			int next_sum_num = sum_num / 2;
+
+			//求和个数为奇数时会有一个多出来的元素
+			if ((sum_num & 0x1))
+			{
+				++id;
+				++next_sum_num;
+			}
+			const int offset = sum_num / 2;
+			if (idx < offset)
+			{
+				res[id] += res[id + offset];
+			}
+			sum_num = next_sum_num;
+			__syncthreads();
+		}
+	}
+
 	__device__ thrust::complex<float_t> return_dHz_w(float_t a, float_t i0, float_t h,
 	                                                 device_array* hankel,
 	                                                 device_array* resistivity,
@@ -42,11 +72,12 @@ namespace gpu
 	{
 		using complex = thrust::complex<float_t>;
 
-		complex ret(0, 0);
-
 		const float_t* hankel_ptr = hankel->get();
 		const float_t* res_ptr = resistivity->get();
 		const float_t* height_ptr = height->get();
+
+		//如果不写成指针循环内访问不到，不太清楚原因
+		complex* ret = new complex(0, 0);
 
 		const int res_size = resistivity->size();
 		const int hankel_size = hankel->size();
@@ -54,18 +85,18 @@ namespace gpu
 		for (int k = 0; k < hankel_size; ++k)
 		{
 			const complex i(0, 1);
-			const float_t lmd = 1 / a * powf(10, a1 + (k * s1));
+			const float_t lmd = 1 / a * pow(10.0, a1 + (k * s1));
+			const float_t lmd_2 = pow(lmd, 2);
 
-			const complex u1 = sqrt(powf(lmd, 2) - i * w * mu0 / res_ptr[0]);
+			const complex wi = i * w * mu0;
+			const complex u1 = sqrt(lmd_2 - wi / res_ptr[0]);
 
 			complex r0 = 1;
-			for (int cc = res_size - 2; cc > 00; --cc)
-			{
-				const float_t lmd_2 = pow(lmd, 2);
-				const complex wi = i * w * mu0;
 
+			for (int cc = res_size - 2; cc >= 0; --cc)
+			{
 				const complex ui = sqrt(lmd_2 - wi / res_ptr[cc]);
-				const complex uii = sqrt(lmd_2 - wi / res_ptr[cc + 1]);
+				const complex uii = sqrt(lmd_2 * lmd - wi / res_ptr[cc + 1]);
 
 				const complex ss = ui / uii * r0;
 				const complex ex1 = exp(-2 * ui * height_ptr[cc]);
@@ -75,10 +106,13 @@ namespace gpu
 			}
 			const complex f1 = 1 + (lmd - u1 / r0) / (lmd + u1 / r0) * exp(-2 * lmd * h);
 
-			ret += f1 * lmd * hankel_ptr[k];
+			*ret += f1 * lmd * hankel_ptr[k];
 		}
-		ret = ret * i0 / 2;
-		return ret;
+		*ret = *ret * i0 / 2;
+
+		auto ret_ = *ret;
+		delete ret;
+		return ret_;
 	}
 
 	/**
@@ -105,7 +139,7 @@ namespace gpu
 		const int cosine_num = blockDim.x;
 		const int cosine_idx = threadIdx.x;
 
-		extern __shared__ float_t res[];
+		__shared__ float_t res[256];
 		__shared__ float_t t;
 		__shared__ float_t* cosine_ptr;
 
@@ -118,20 +152,21 @@ namespace gpu
 
 		__syncthreads();
 
-		float_t w = 1 / t * exp((-150 + cosine_idx - 1) * std::log(10.0) / 20);
+		float_t w = 1 / t * exp((-150 + cosine_idx + 1) * std::log(10.0) / 20);
 		thrust::complex<float_t> hz_w = return_dHz_w(a, i0, h, hankel, resistivity, height, w);
 
 		res[cosine_idx] = hz_w.imag() / w * cosine_ptr[cosine_idx];
 
+		__syncthreads();
 		int sum_num = cosine_num;
 		//二分求和
-		while (sum_num > 0)
+		while (sum_num > 1)
 		{
 			int idx = cosine_idx;
 			int next_sum_num = sum_num / 2;
 
 			//求和个数为奇数时会有一个多出来的元素
-			if (sum_num | 0x1)
+			if ((sum_num & 0x1))
 			{
 				++idx;
 				++next_sum_num;
@@ -145,9 +180,11 @@ namespace gpu
 			__syncthreads();
 		}
 
+		auto r = res[0];
 		//保存正演结果磁场强度到全局显存
 		if (cosine_idx == 0)
 		{
+			printf("block %d complete\n", time_idx);
 			b->get()[time_idx] = res[0];
 		}
 	}
@@ -232,6 +269,30 @@ namespace gpu
 				throw std::runtime_error("测试cuda设备失败，计算错误");
 			}
 		}
+
+		vector s(250);
+		for(int i=0;i<s.size();++i)
+		{
+			s[i] = i;
+		}
+		device_array s_d(s);
+
+		auto res = (s[0] + s[s.size() - 1]) * s.size() / 2;
+
+		LOG("sum test start");
+		test_sum_kernel << <1, s.size() >> >(s_d.get_device_ptr());
+		err = cudaDeviceSynchronize();
+		CHECK;
+
+		s_d.save_data(s);
+
+		LOG("sum test end");
+
+		if (s[0] != res)
+		{
+			throw std::runtime_error("测试cuda设备失败，计算错误");
+		}
+
 		global::log("test_cuda_device", "test end");
 	}
 
@@ -252,13 +313,18 @@ namespace gpu
 		device_array late_m_d(time.size());
 		device_array late_e_d(time.size());
 
-		forward_kernel << <time_d.size(), cosine_d.size(), sizeof(float_t) * cosine_d.size() >> >(
+		forward_kernel << <time_d.size(), cosine_d.size()>> >(
 			a, i0, h,
 			cosine_d.get_device_ptr(), hankel_d.get_device_ptr(),
 			res_d.get_device_ptr(), height_d.get_device_ptr(),
 			time_d.get_device_ptr(), b.get_device_ptr());
 		auto err = cudaDeviceSynchronize();
 		CHECK;
+
+#if defined(_DEBUG)
+		vector test_b;
+		b.save_data(test_b);
+#endif
 
 		calc_response_kernel << <1, time_d.size() >> >(
 			a, i0, h,
