@@ -147,12 +147,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="data_py.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="data.h" />
     <ClInclude Include="data_model_base.h" />
     <ClInclude Include="global.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="data_py.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

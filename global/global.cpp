@@ -1,4 +1,4 @@
-﻿#include <ctime>
+#include <ctime>
 #include <string>
 #include <sstream>
 #include <iomanip>

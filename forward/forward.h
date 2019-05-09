@@ -71,9 +71,13 @@ class forward_gpu final : public forward_base
 {
 public:
 	forward_gpu() = default;
+	forward_gpu(const forward_gpu& f) = default;
+	forward_gpu(forward_gpu&& f) = default;
+
 	~forward_gpu() = default;
 
 	forward_gpu& operator=(const forward_gpu& f) = default;
+	forward_gpu& operator=(forward_gpu&& f) = default;
 
 	/**
 	 * \brief 初始化CUDA设备
@@ -112,8 +116,6 @@ public:
 	 */
 	void forward() override
 	{
-		TIMER();
-
 		assert(geomodel.size());
 		assert(check_coef());
 
@@ -132,6 +134,9 @@ public:
 			             geomodel["resistivity"], geomodel["height"],
 			             time_stamp["time"],
 			             data_late_m["response"], data_late_e["response"]);
+
+			//电场响应的最后一组数据是无效的
+			data_late_e.pop_back();
 		}
 		catch (std::exception& e)
 		{

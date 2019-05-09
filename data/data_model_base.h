@@ -215,6 +215,14 @@ public:
 		data[idx] = p;
 	}
 
+	virtual void pop_back()
+	{
+		for (auto& item : data)
+		{
+			item.pop_back();
+		}
+	}
+
 	virtual size_type size() const
 	{
 		return data[0].size();

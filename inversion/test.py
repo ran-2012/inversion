@@ -1,10 +1,11 @@
 ﻿
 import os
 import data_py
+import forward_py
 
-def test_main():
+def data_test():
 	try:
-		print(u'呃')
+		print('data_test begin')
 		print(data_py.test_func())
 		a=data_py.vec_test_func()
 		d=data_py.isometric_model()
@@ -22,6 +23,12 @@ def test_main():
 		print('error')
 	finally:
 		input()
+
+def forward_test():
+	try:
+		g=forward_py.forward_gpu()
+	except Exception as e:
+		print('error')
 
 test_main()
 
