@@ -82,7 +82,7 @@ public:
 	/**
 	 * \brief 初始化CUDA设备
 	 */
-	static void init_cuda_device()
+	void init_cuda_device()
 	{
 		try
 		{
@@ -93,12 +93,13 @@ public:
 			global::err(e.what());
 			global::err("init cuda device failed");
 		}
+		LOG("init cuda device completed");
 	}
 
 	/**
 	 * \brief 测试CUDA设备
 	 */
-	static void test_cuda_device()
+	void test_cuda_device()
 	{
 		try
 		{

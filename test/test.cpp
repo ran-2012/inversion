@@ -40,7 +40,7 @@ void cuda_test()
 	TIMER();
 
 	forward_gpu f;
-	forward_gpu::test_cuda_device();
+	f.test_cuda_device();
 
 	LOG("cuda_test end");
 }

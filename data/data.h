@@ -1,12 +1,12 @@
-ï»¿#pragma once
+#pragma once
 
 #include "data_model_base.h"
 
-//æ­£æ¼”æ•°æ®
+//ÕıÑİÊı¾İ
 class forward_data;
-//åœ°ç”µæ¨¡å‹
+//µØµçÄ£ĞÍ
 class geoelectric_model;
-//ç­‰åšåœ°ç”µæ¨¡å‹
+//µÈºñµØµçÄ£ĞÍ
 class isometric_model;
 
 class forward_data final : public data_model_base
@@ -50,7 +50,7 @@ public:
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		throw std::out_of_range("ä¸‹æ ‡é”™è¯¯");
+		throw std::out_of_range("ÏÂ±ê´íÎó");
 	}
 
 	forward_data& operator=(const forward_data& f)
@@ -153,7 +153,7 @@ public:
 			return 0;
 		if (name == string(second_name))
 			return 1;
-		throw std::out_of_range("ä¸‹æ ‡é”™è¯¯");
+		throw std::out_of_range("ÏÂ±ê´íÎó");
 	}
 
 	float_t get_height() const
@@ -213,7 +213,7 @@ public:
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		throw std::out_of_range("ä¸‹æ ‡é”™è¯¯");
+		throw std::out_of_range("ÏÂ±ê´íÎó");
 	}
 
 	geoelectric_model& operator=(const geoelectric_model& f) = default;

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include <type_traits>
 #include <ios>
@@ -14,7 +14,7 @@
 
 #include "../global/global.h"
 
-//åœ°ç”µæ¨¡å‹ä¸æ­£æ¼”ç»“æœåŸºç±»
+//µØµçÄ£ĞÍÓëÕıÑİ½á¹û»ùÀà
 class data_model_base
 {
 protected:
@@ -31,15 +31,15 @@ protected:
 	static void throw_critical_data_miss_exception(const string& data_name)
 	{
 		std::stringstream msg;
-		msg << "å…³é”®æ•°æ®";
+		msg << "¹Ø¼üÊı¾İ";
 		msg << data_name;
-		msg << "ä¸å­˜åœ¨";
+		msg << "²»´æÔÚ";
 		throw std::runtime_error(msg.str());
 	}
 
 	static void ordinary_data_miss(const string& data_name)
 	{
-		global::err("æ•°æ®", data_name, "ä¸å­˜åœ¨");
+		global::err("Êı¾İ", data_name, "²»´æÔÚ");
 	}
 
 	virtual void load_version(const json& j)
@@ -111,7 +111,7 @@ protected:
 		catch (std::out_of_range& e)
 		{
 			global::err(e.what());
-			global::err("æ•°æ®ä¸­çš„countæˆ–idxæœ‰è¯¯");
+			global::err("Êı¾İÖĞµÄcount»òidxÓĞÎó");
 			throw;
 		}
 	}
@@ -210,7 +210,7 @@ public:
 	{
 		if (idx >= data.size())
 		{
-			throw(std::runtime_error("idxè¶…è¿‡dataçš„æ•°æ®èŒƒå›´"));
+			throw(std::runtime_error("idx³¬¹ıdataµÄÊı¾İ·¶Î§"));
 		}
 		data[idx] = p;
 	}
@@ -237,13 +237,13 @@ public:
 			input_file.open(path, std::ifstream::in);
 			if (!input_file)
 			{
-				throw std::runtime_error(global::msg("æ–‡ä»¶", path, "ä¸å­˜åœ¨"));
+				throw std::runtime_error(global::msg("ÎÄ¼ş", path, "²»´æÔÚ"));
 			}
 		}
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("æ— æ³•æ‰“å¼€æ–‡ä»¶", path);
+			global::err("ÎŞ·¨´ò¿ªÎÄ¼ş", path);
 			return;
 		}
 		try
@@ -254,7 +254,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("åŠ è½½jsonå¤±è´¥", path);
+			global::err("¼ÓÔØjsonÊ§°Ü", path);
 			return;
 		}
 		load_from_json(j);
@@ -271,7 +271,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("æ— æ³•æ‰“å¼€æ–‡ä»¶", path);
+			global::err("ÎŞ·¨´ò¿ªÎÄ¼ş", path);
 			return;
 		}
 		try
@@ -282,7 +282,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("æ— æ³•å†™å…¥æ–‡ä»¶", path);
+			global::err("ÎŞ·¨Ğ´ÈëÎÄ¼ş", path);
 		}
 	}
 

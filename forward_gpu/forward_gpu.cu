@@ -28,7 +28,7 @@ namespace gpu
 		{
 			return;
 		}
-		printf("%f = %f * %f\n", dc[i], da[i], db[i]);
+		// printf("%f = %f * %f\n", dc[i], da[i], db[i]);
 		dc[i] = da[i] * db[i];
 	}
 
@@ -205,7 +205,6 @@ namespace gpu
 		int device_count;
 		auto err = cudaGetDeviceCount(&device_count);
 		CHECK;
-		global::log("forward", "init_cuda_device complete");
 	}
 
 	void test_cuda_device()

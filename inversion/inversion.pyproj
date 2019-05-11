@@ -13,7 +13,7 @@
     <RootNamespace>inversion</RootNamespace>
     <InterpreterId>CondaEnv|CondaEnv|tensorflow</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +24,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="forward\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="inversion.py" />
     <Compile Include="test.py">
       <SubType>Code</SubType>
@@ -38,11 +41,9 @@
       <Project>{06142c33-c66a-4bdd-8289-68f59333d1c6}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\forward\forward.vcxproj">
-      <Name>forward</Name>
-      <Project>{992e3957-d697-4129-ba03-1287956435ae}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="forward\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

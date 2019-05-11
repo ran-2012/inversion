@@ -1,4 +1,3 @@
-
 //this file is encoded in ASCII due to python may not recognize other encoding correctly
 #pragma comment(lib, "global.lib")
 #pragma comment(lib, "forward_gpu.lib")
@@ -22,13 +21,13 @@ PYBIND11_MODULE(data_py, m)
 
 	py::bind_vector<std::vector<global::float_t>>(m, "vector_float_t");
 
-	m.def("test_func", []() {return "hello world!"; }, "test function");
-	m.def("vec_test_func", []() {return std::vector<global::float_t>{1, 2, 3}; });
+	m.def("test_func", []() { return "hello world!"; }, "test function");
+	m.def("vec_test_func", []() { return std::vector<global::float_t>{1, 2, 3}; });
 
 	//data_model_base
 	auto b = py::class_<data_model_base>(m, "data_model_base");
 	b.doc() = "data model base class";
-	b.def_readwrite("name", &data_model_base::name ,"name");
+	b.def_readwrite("name", &data_model_base::name, "name");
 	b.def_readwrite("version", &data_model_base::version, "version");
 	b.def_readwrite("comment", &data_model_base::comment, "content description");
 
@@ -60,6 +59,8 @@ PYBIND11_MODULE(data_py, m)
 	f.doc() = "forward data";
 
 	f.def(py::init<>());
+	f.def("generate_time_stamp_by_count", &forward_data::generate_time_stamp_by_count);
+	f.def("generate_default_time_stamp", &forward_data::generate_default_time_stamp);
 
 	//filter_coefficient
 	auto c = py::class_<filter_coefficient>(m, "filter_coefficient");
@@ -88,7 +89,4 @@ PYBIND11_MODULE(data_py, m)
 
 	fw.def("get_result_late_m", &forward_gpu::get_result_late_m);
 	fw.def("get_result_late_e", &forward_gpu::get_result_late_e);
-
 }
-
-
