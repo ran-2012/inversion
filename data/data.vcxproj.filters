@@ -18,9 +18,6 @@
     <ClInclude Include="data_model_base.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="global.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="data.h">
       <Filter>头文件</Filter>
     </ClInclude>

@@ -4,7 +4,6 @@
 #include <ios>
 #include <cmath>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <exception>
@@ -30,16 +29,13 @@ protected:
 
 	static void throw_critical_data_miss_exception(const string& data_name)
 	{
-		std::stringstream msg;
-		msg << "关键数据";
-		msg << data_name;
-		msg << "不存在";
-		throw std::runtime_error(msg.str());
+		throw std::runtime_error(
+			global::msg("critical data ", data_name, " does not exist"));
 	}
 
 	static void ordinary_data_miss(const string& data_name)
 	{
-		global::err("数据", data_name, "不存在");
+		global::err("data ", data_name, "does not exist");
 	}
 
 	virtual void load_version(const json& j)
@@ -100,7 +96,7 @@ protected:
 		{
 			for (auto& item_j : data_j)
 			{
-				size_type idx = static_cast<size_type>(std::round(item_j[index_name].get<float_t>() - 1));
+				const auto idx = static_cast<size_type>(std::round(item_j[index_name].get<float_t>() - 1));
 				for (size_type i = 0; i < _data_content_count(); ++i)
 				{
 					auto temp = item_j[data_names[i]].get<float_t>();
@@ -111,7 +107,7 @@ protected:
 		catch (std::out_of_range& e)
 		{
 			global::err(e.what());
-			global::err("数据中的count或idx有误");
+			global::err("count or idx is wrong");
 			throw;
 		}
 	}
@@ -210,7 +206,7 @@ public:
 	{
 		if (idx >= data.size())
 		{
-			throw(std::runtime_error("idx超过data的数据范围"));
+			throw std::out_of_range("idx out of range");
 		}
 		data[idx] = p;
 	}
@@ -237,13 +233,14 @@ public:
 			input_file.open(path, std::ifstream::in);
 			if (!input_file)
 			{
-				throw std::runtime_error(global::msg("文件", path, "不存在"));
+				throw std::runtime_error(
+					global::msg("file ", path, "does not exist"));
 			}
 		}
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("无法打开文件", path);
+			global::err("fail to open file ", path);
 			return;
 		}
 		try
@@ -254,7 +251,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("加载json失败", path);
+			global::err("fail to load JSON ", path);
 			return;
 		}
 		load_from_json(j);
@@ -271,7 +268,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("无法打开文件", path);
+			global::err("fail to open file ", path);
 			return;
 		}
 		try
@@ -282,7 +279,7 @@ public:
 		catch (std::exception& e)
 		{
 			global::err(e.what());
-			global::err("无法写入文件", path);
+			global::err("fail to write file ", path);
 		}
 	}
 

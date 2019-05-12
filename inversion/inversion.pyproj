@@ -27,6 +27,9 @@
     <Compile Include="forward\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="helper\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="inversion.py" />
     <Compile Include="test.py">
       <SubType>Code</SubType>
@@ -44,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="forward\" />
+    <Folder Include="helper\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

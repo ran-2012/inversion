@@ -2,7 +2,10 @@ import data_py
 
 
 class data_model_base:
-    b = data_py.data_model_base()
+
+    def __init__(self):
+        super.__init__()
+        self.b = data_py.data_model_base()
 
     def __getitem__(self, idx: str):
         return self.b[idx]
@@ -10,8 +13,17 @@ class data_model_base:
     def __setitem__(self, idx: int, item: list):
         self.b[idx] = item
 
+    def __len__(self):
+        return self.count
+
     def get_count(self):
         return self.b.count
+
+    def get_name(self):
+        return self.b.name
+
+    def set_name(self, n: str):
+        self.b.name = n
 
     def load_from_file(self, path: str):
         self.b.load_from_file(path)
@@ -20,14 +32,19 @@ class data_model_base:
         self.b.save_to_file(path)
 
     count = property(get_count)
+    name = property(get_name, set_name)
 
 
 class geoelectric_model(data_model_base):
-    b = data_py.geoelectric_model()
+
+    def __init__(self):
+        self.b = data_py.geoelectric_model()
 
 
 class isometric_model(data_model_base):
-    b = data_py.isometric_model()
+
+    def __init__(self):
+        self.b = data_py.isometric_model()
 
     def get_height(self):
         return self.b.layer_height
@@ -39,7 +56,9 @@ class isometric_model(data_model_base):
 
 
 class forward_data(data_model_base):
-    b = data_py.forward_data()
+
+    def __init__(self):
+        self.b = data_py.forward_data()
 
     def generate_time_stamp_by_count(self, exponent_1: float, exponent_2: float, count: int):
         self.b.generate_time_stamp_by_count(exponent_1, exponent_2, count)
@@ -49,7 +68,9 @@ class forward_data(data_model_base):
 
 
 class filter_coefficient:
-    f = data_py.filter_coefficient()
+
+    def __init__(self):
+        self.f = data_py.filter_coefficient()
 
     def load_hkl_coef(self, path: str):
         self.f.load_hkl_coef(path)
@@ -59,7 +80,9 @@ class filter_coefficient:
 
 
 class forward_gpu:
-    fw = data_py.forward_gpu()
+
+    def __init__(self):
+        self.fw = data_py.forward_gpu()
 
     def load_general_params(self, a, i, h):
         self.fw.load_general_params(a, i, h)

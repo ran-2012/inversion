@@ -1,25 +1,6 @@
-﻿import os
-import forward
-
-
-# def mswig_import_helper():
-#     from os.path import dirname
-#     import imp
-#     fp = None
-#     try:
-#         fp, pathname, description = imp.find_module('data_py', [dirname(__file__)])
-#     except ImportError:
-#         import data_py
-#         return data_py
-#     if fp is not None:
-#         try:
-#             _mod = imp.load_module('data_py', fp, pathname, description)
-#         finally:
-#             fp.close()
-#         return _mod
-#
-#
-# data_py = swig_import_helper()
+﻿import forward
+from helper import *
+import logging as log
 
 
 def data_test():
@@ -36,12 +17,12 @@ def data_test():
         d2.save_to_file('../test_data/data_save_test_geo.json')
 
     except Exception as e:
-        print(e.args)
-        print('error')
+        log.error(repr(e))
     finally:
-        print("data_test finished")
+        log.debug("data_test finished")
 
 
+@timer
 def cuda_test():
     g = forward.forward_gpu()
     g.init_cuda_device()
@@ -54,12 +35,17 @@ def forward_test():
         f = forward.forward_gpu()
         coef = forward.filter_coefficient()
         geo = forward.geoelectric_model()
+        geo2 = forward.geoelectric_model()
         data = forward.forward_data()
 
         coef.load_cos_coef('../test_data/cos_xs.txt')
         coef.load_hkl_coef('../test_data/hankel1.txt')
         geo.load_from_file('../test_data/test_geo_model.json')
+        geo2.load_from_file('../test_data/test_geo_model2.json')
         data.generate_time_stamp_by_count(-5, 0, 100)
+
+        fig = draw_resistivity(geo, geo2, last_height=300)
+        fig.show()
 
         f.load_general_params(10, 100, 50)
         f.load_filter_coef(coef)
@@ -71,12 +57,20 @@ def forward_test():
         m = f.get_result_late_m()
         e = f.get_result_late_e()
 
+        m.name = 'late_m'
+        e.name = 'late_e'
+
+        draw_forward_result(m)
+
     except Exception as e:
-        print(repr(e))
-        print('error')
+        log.error(repr(e))
+    finally:
+        log.debug('forward_test finished')
 
 
 if __name__ == '__main__':
+    set_default_log()
+
     data_test()
     cuda_test()
     forward_test()

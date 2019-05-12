@@ -143,6 +143,7 @@ public:
 		{
 			global::err(e.what());
 			global::err("forward failed");
+			throw;
 		}
 	}
 };

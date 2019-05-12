@@ -50,7 +50,7 @@ public:
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		throw std::out_of_range("下标错误");
+		throw std::out_of_range("idx out of range");
 	}
 
 	forward_data& operator=(const forward_data& f)
@@ -153,7 +153,7 @@ public:
 			return 0;
 		if (name == string(second_name))
 			return 1;
-		throw std::out_of_range("下标错误");
+		throw std::out_of_range("idx out of range");
 	}
 
 	float_t get_height() const
@@ -161,12 +161,7 @@ public:
 		return layer_height;
 	}
 
-	isometric_model& operator=(const isometric_model& g)
-	{
-		this->data_model_base::operator=(g);
-		layer_height = g.layer_height;
-		return *this;
-	}
+	isometric_model& operator=(const isometric_model& g) = default;
 
 	isometric_model& operator=(isometric_model&& g) noexcept
 	{
@@ -213,7 +208,7 @@ public:
 			return 1;
 		if (name == string(third_name))
 			return 2;
-		throw std::out_of_range("下标错误");
+		throw std::out_of_range("idx out of range");
 	}
 
 	geoelectric_model& operator=(const geoelectric_model& f) = default;
@@ -258,14 +253,12 @@ public:
 
 	filter_coefficient() = default;
 
-	filter_coefficient(const filter_coefficient& coef)
-	{
-		*this = coef;
-	}
-
+	filter_coefficient(const filter_coefficient& coef) = default;
+	filter_coefficient(filter_coefficient&& coef) = default;
 	~filter_coefficient() = default;
 
 	filter_coefficient& operator=(const filter_coefficient& coef) = default;
+	filter_coefficient& operator=(filter_coefficient&& coef) = default;
 
 	static void load_coef_from_file(const string& path, vector& v)
 	{

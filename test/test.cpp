@@ -2,12 +2,8 @@
 #pragma comment(lib, "forward_gpu.lib")
 #pragma comment(lib, "cudart_static.lib")
 
-#include <iostream>
-#include <exception>
-
 #include <string>
 #include <iostream>
-#include <cstdlib>
 
 #include "../global/global.h"
 #include "../data/data.h"
@@ -75,7 +71,7 @@ void forward_test()
 	auto t = data_late_m["time"];
 	auto r = data_late_m["response"];
 
-	for (auto i = 0; i < n.size(); ++i)
+	for (size_t i = 0; i < n.size(); ++i)
 	{
 		std::cout << i << ' ' << t[i] << ' ' << r[i] << std::endl;
 	}
@@ -83,11 +79,18 @@ void forward_test()
 	LOG("forward_test end");
 }
 
-int main()
+int main() noexcept
 {
-	data_test();
-	cuda_test();
-	forward_test();
+	try
+	{
+		data_test();
+		cuda_test();
+		forward_test();
+	}
+	catch (...)
+	{
+		LOG("test failed");
+	}
 
 	return 0;
 }
