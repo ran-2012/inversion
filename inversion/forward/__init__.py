@@ -10,7 +10,10 @@ class data_model_base:
     def __getitem__(self, idx: str):
         return self.b[idx]
 
-    def __setitem__(self, idx: int, item: list):
+    def __setitem__(self, idx: str, item: data_py.vector_float_t):
+        self.b[idx] = item
+
+    def set_item_s(self, idx: str, item):
         self.b[idx] = item
 
     def __len__(self):
@@ -25,6 +28,12 @@ class data_model_base:
     def set_name(self, n: str):
         self.b.name = n
 
+    def get_idx(self):
+        return self.b['idx']
+
+    def set_idx(self, idx):
+        self.b['idx'] = idx
+
     def load_from_file(self, path: str):
         self.b.load_from_file(path)
 
@@ -33,6 +42,7 @@ class data_model_base:
 
     count = property(get_count)
     name = property(get_name, set_name)
+    idx = property(get_idx, set_idx)
 
 
 class geoelectric_model(data_model_base):
@@ -53,6 +63,12 @@ class isometric_model(data_model_base):
         self.b.layer_height = height
 
     height = property(get_height, set_height)
+
+
+def iso_to_geo(iso: isometric_model) -> geoelectric_model:
+    g = geoelectric_model()
+    g.b = data_py.iso_to_geo(iso.b)
+    return g
 
 
 class forward_data(data_model_base):
@@ -106,7 +122,11 @@ class forward_gpu:
         self.fw.forward()
 
     def get_result_late_m(self) -> forward_data:
-        return self.fw.get_result_late_m()
+        ret = forward_data()
+        ret.b = self.fw.get_result_late_m()
+        return ret
 
     def get_result_late_e(self) -> forward_data:
-        return self.fw.get_result_late_e()
+        ret = forward_data()
+        ret.b = self.fw.get_result_late_e()
+        return ret

@@ -1,6 +1,7 @@
-﻿import forward
+﻿import traceback
+
+import forward
 from helper import *
-import logging as log
 
 
 def data_test():
@@ -12,11 +13,11 @@ def data_test():
         for i in range(d.count):
             print(d['idx'][i])
 
-        d2 = forward.geoelectric_model()
-        d2 = d
+        d2 = forward.iso_to_geo(d)
         d2.save_to_file('../test_data/data_save_test_geo.json')
 
     except Exception as e:
+        traceback.print_exc()
         log.error(repr(e))
     finally:
         log.debug("data_test finished")
@@ -36,15 +37,17 @@ def forward_test():
         coef = forward.filter_coefficient()
         geo = forward.geoelectric_model()
         geo2 = forward.geoelectric_model()
+        iso = forward.isometric_model()
         data = forward.forward_data()
 
         coef.load_cos_coef('../test_data/cos_xs.txt')
         coef.load_hkl_coef('../test_data/hankel1.txt')
         geo.load_from_file('../test_data/test_geo_model.json')
         geo2.load_from_file('../test_data/test_geo_model2.json')
+        iso.load_from_file('../test_data/test_geo_model3.json')
         data.generate_time_stamp_by_count(-5, 0, 100)
 
-        fig = draw_resistivity(geo, geo2, last_height=300)
+        fig = draw_resistivity(geo, geo2, forward.iso_to_geo(iso), last_height=300)
         fig.show()
 
         f.load_general_params(10, 100, 50)
@@ -60,18 +63,24 @@ def forward_test():
         m.name = 'late_m'
         e.name = 'late_e'
 
-        draw_forward_result(m)
+        fig = draw_forward_result(m, e)
+        fig.show()
+
+        add_noise(m, 0.1)
+        fig = draw_forward_result(m)
+
+        fig.show()
 
     except Exception as e:
+        traceback.print_exc()
         log.error(repr(e))
     finally:
         log.debug('forward_test finished')
 
 
 if __name__ == '__main__':
-    set_default_log()
-
     data_test()
     cuda_test()
     forward_test()
-    input("Press Enter to continue...")
+
+    input("Press Enter to continue...\n")

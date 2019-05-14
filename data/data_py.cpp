@@ -23,7 +23,8 @@ PYBIND11_MODULE(data_py, m)
 
 	m.def("test_func", []() { return "hello world!"; }, "test function");
 	m.def("vec_test_func", []() { return std::vector<global::float_t>{1, 2, 3}; });
-
+	m.def("iso_to_geo", [](const isometric_model& i) {geoelectric_model g; g = i; return g; });
+	
 	//data_model_base
 	auto b = py::class_<data_model_base>(m, "data_model_base");
 	b.doc() = "data model base class";
@@ -32,7 +33,7 @@ PYBIND11_MODULE(data_py, m)
 	b.def_readwrite("comment", &data_model_base::comment, "content description");
 
 	b.def("__getitem__", &data_model_base::get_item_s);
-	b.def("__setitem__", &data_model_base::set_item);
+	b.def("__setitem__", &data_model_base::set_item_s);
 	b.def("get_content_name", &data_model_base::get_content_name);
 	b.def_property_readonly("count", &data_model_base::size, "number of data");
 

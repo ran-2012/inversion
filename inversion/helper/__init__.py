@@ -1,13 +1,28 @@
-import matplotlib.pyplot as plt
 import time
-import logging as log
-from forward import *
+import logging
+import matplotlib.pyplot as plt
+import numpy as npy
+
+from forward import forward_data
 
 
-def set_default_log():
-    log.basicConfig(format='%(asctime)s   %(levelname)s   %(funcName)s   %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=log.DEBUG)
+def get_logger():
+
+    _log = logging.getLogger('local')
+    _log.setLevel(logging.DEBUG)
+    _log.propagate = False
+
+    formatter = logging.Formatter(fmt='%(asctime)s   %(levelname)s   %(funcName)s   %(message)s',
+                                  datefmt='%H:%M:%S')
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    _log.addHandler(handler)
+
+    return _log
+
+
+log = get_logger()
 
 
 def process_resistivity(height: list, resistivity: list, final_height: float):
@@ -29,7 +44,7 @@ def process_resistivity(height: list, resistivity: list, final_height: float):
         height_idx = height_idx + 1
         height_total += height[height_idx]
 
-        if height_idx == len(resistivity):
+        if height_idx == len(resistivity) - 1:
             height_ret.append(final_height)
         else:
             height_ret.append(height_total)
@@ -37,7 +52,6 @@ def process_resistivity(height: list, resistivity: list, final_height: float):
 
 
 def draw_resistivity(*model_list, **kwargs):
-
     last_height = 200
     if 'last_height' in kwargs:
         last_height = kwargs['last_height']
@@ -48,7 +62,7 @@ def draw_resistivity(*model_list, **kwargs):
         draw_list.append(draw_item)
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, xlabel='height', ylabel='height')
+    ax = fig.add_subplot(1, 1, 1, xlabel='height', ylabel='resistivity')
 
     for draw_item, g in zip(draw_list, model_list):
         ax.plot(draw_item[0], draw_item[1], label=g.name)
@@ -62,14 +76,14 @@ def draw_forward_result(forward_result: forward_data, *args):
     if len(args) > 0:
         result_list += args
 
-    plt.xlabel('time')
-    plt.ylabel('response')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, xlabel='time', ylabel='response')
 
     for f in result_list:
-        plt.loglog(forward_result['time'], forward_result['response'], label=f.name)
+        ax.loglog(f['time'], f['response'], label=f.name)
 
-    plt.legend()
-    plt.show()
+    ax.legend()
+    return fig
 
 
 def timer(f):
@@ -81,3 +95,11 @@ def timer(f):
         return res
 
     return _timer
+
+
+def add_noise(f: forward_data, ratio=0.05):
+    response = f['response']
+    for i in range(len(response)):
+        response[i] += npy.random.normal(0, response[i] * ratio, )
+
+    f.set_item_s('response', response)

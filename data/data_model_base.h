@@ -35,7 +35,7 @@ protected:
 
 	static void ordinary_data_miss(const string& data_name)
 	{
-		global::err("data ", data_name, "does not exist");
+		global::err("data ", data_name, " does not exist");
 	}
 
 	virtual void load_version(const json& j)
@@ -202,13 +202,9 @@ public:
 		return data[get_name_idx(name)];
 	}
 
-	virtual void set_item(size_type idx, const vector& p)
+	virtual void set_item_s(const string& idx, const vector& p)
 	{
-		if (idx >= data.size())
-		{
-			throw std::out_of_range("idx out of range");
-		}
-		data[idx] = p;
+		data[get_name_idx(idx)] = p;
 	}
 
 	virtual void pop_back()
