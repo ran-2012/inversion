@@ -14,23 +14,31 @@
 namespace py = pybind11;
 
 PYBIND11_MAKE_OPAQUE(std::vector<global::float_t>);
+PYBIND11_MAKE_OPAQUE(std::vector<std::vector<global::float_t>>);
 
 PYBIND11_MODULE(data_py, m)
 {
 	m.doc() = "data and model in forward process";
 
 	py::bind_vector<std::vector<global::float_t>>(m, "vector_float_t");
+	py::bind_vector<std::vector<std::vector<global::float_t>>>(m, "vector_vector_float_t");
 
 	m.def("test_func", []() { return "hello world!"; }, "test function");
 	m.def("vec_test_func", []() { return std::vector<global::float_t>{1, 2, 3}; });
-	m.def("iso_to_geo", [](const isometric_model& i) {geoelectric_model g; g = i; return g; });
-	
+	m.def("iso_to_geo", [](const isometric_model& i)
+	{
+		geoelectric_model g;
+		g = i;
+		return g;
+	});
+
 	//data_model_base
 	auto b = py::class_<data_model_base>(m, "data_model_base");
 	b.doc() = "data model base class";
 	b.def_readwrite("name", &data_model_base::name, "name");
 	b.def_readwrite("version", &data_model_base::version, "version");
 	b.def_readwrite("comment", &data_model_base::comment, "content description");
+	b.def_readwrite("data", &data_model_base::data);
 
 	b.def("__getitem__", &data_model_base::get_item_s);
 	b.def("__setitem__", &data_model_base::set_item_s);
@@ -39,6 +47,7 @@ PYBIND11_MODULE(data_py, m)
 
 	b.def(py::init<>());
 	b.def(py::init<data_model_base>());
+	b.def("resize", &data_model_base::resize);
 	b.def("load_from_file", &data_model_base::load_from_file, "load data from json file");
 	b.def("save_to_file", &data_model_base::save_to_file, "save data to json file");
 
@@ -78,6 +87,16 @@ PYBIND11_MODULE(data_py, m)
 	fw.doc() = "GPU forward";
 
 	fw.def(py::init<>());
+	fw.def_readwrite("a", &forward_gpu::a);
+	fw.def_readwrite("i0", &forward_gpu::i0);
+	fw.def_readwrite("h", &forward_gpu::h);
+
+	fw.def_readwrite("filter", &forward_gpu::filter);
+	fw.def_readwrite("geo_model", &forward_gpu::geomodel);
+	fw.def_readwrite("time_stamp", &forward_gpu::time_stamp);
+	fw.def_readwrite("data_late_e", &forward_gpu::data_late_e);
+	fw.def_readwrite("data_late_m", &forward_gpu::data_late_m);
+
 	fw.def("load_general_params", &forward_gpu::load_general_params_s);
 	fw.def("load_geo_model", &forward_gpu::load_geo_model);
 	fw.def("load_filter_coef", &forward_gpu::load_filter_coef);
@@ -87,6 +106,7 @@ PYBIND11_MODULE(data_py, m)
 	fw.def("test_cuda_device", &forward_gpu::test_cuda_device);
 
 	fw.def("forward", &forward_gpu::forward);
+	fw.def("gradient", &forward_gpu::gradient);
 
 	fw.def("get_result_late_m", &forward_gpu::get_result_late_m);
 	fw.def("get_result_late_e", &forward_gpu::get_result_late_e);

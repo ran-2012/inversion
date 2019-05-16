@@ -1,0 +1,49 @@
+{
+    "comment": "",
+    "count": 0,
+    "data": [
+        {
+            "idx": 1.0,
+            "resistivity": 149.39083862304688
+        },
+        {
+            "idx": 2.0,
+            "resistivity": 93.72822570800781
+        },
+        {
+            "idx": 3.0,
+            "resistivity": 150.73614501953125
+        },
+        {
+            "idx": 4.0,
+            "resistivity": 150.9227752685547
+        },
+        {
+            "idx": 5.0,
+            "resistivity": 150.64898681640625
+        },
+        {
+            "idx": 6.0,
+            "resistivity": 150.5843963623047
+        },
+        {
+            "idx": 7.0,
+            "resistivity": 150.53466796875
+        },
+        {
+            "idx": 8.0,
+            "resistivity": 150.4416961669922
+        },
+        {
+            "idx": 9.0,
+            "resistivity": 150.30020141601563
+        },
+        {
+            "idx": 10.0,
+            "resistivity": 158.31800842285156
+        }
+    ],
+    "layer_height": 20.0,
+    "name": "inversion",
+    "version": "0.3.4"
+}

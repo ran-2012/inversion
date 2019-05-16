@@ -1,10 +1,13 @@
 ﻿#pragma once
 
 #include <vector>
+#include <thread>
+#include <future>
 
 #include "../data/data.h"
 #include "../global/global.h"
 #include "../forward_gpu/forward_gpu.h"
+#include <pybind11/operators.h>
 
 class forward_base
 {
@@ -15,7 +18,6 @@ public:
 
 	constexpr static float_t threshold = 1e-5;
 
-protected:
 	float_t a = 10;
 	float_t i0 = 1;
 	float_t h = 0;
@@ -62,6 +64,7 @@ public:
 	virtual void load_time_stamp(const forward_data& data) final { time_stamp = data; }
 
 	virtual void forward() = 0;
+	virtual std::vector<vector> gradient(float_t step = 1) = 0;
 
 	virtual forward_data get_result_late_m() { return data_late_m; }
 	virtual forward_data get_result_late_e() { return data_late_e; }
@@ -117,8 +120,22 @@ public:
 	 */
 	void forward() override
 	{
-		assert(geomodel.size());
-		assert(check_coef());
+		TIMER();
+		if (!geomodel.size())
+		{
+			throw std::runtime_error("empty geomodel");
+		}
+		if (!check_coef())
+		{
+			throw std::runtime_error("filter coefficient not available");
+		}
+		for (auto res : geomodel["resistivity"])
+		{
+			if (res <= 0)
+			{
+				throw std::invalid_argument("resistivity must be greater than 0");
+			}
+		}
 
 		if (time_stamp.size() == 0)
 		{
@@ -145,5 +162,50 @@ public:
 			global::err("forward failed");
 			throw;
 		}
+	}
+
+	/**
+	 * \brief 计算y+dy
+	 * \param step dx
+	 * \return 
+	 */
+	std::vector<vector> gradient(float_t step) override
+	{
+		TIMER();
+
+		std::vector<vector> grads;
+		grads.resize(geomodel.size());
+		auto grad_thread = [this, &grads, step](size_t idx)
+		{
+			try
+			{
+				auto temp_forward = *this;
+				temp_forward.geomodel["resistivity"][idx] += step;
+
+				temp_forward.forward();
+
+				auto temp_response_m = temp_forward.get_result_late_m();
+				grads[idx] = std::move(temp_response_m["response"]);
+			}
+			catch (std::exception& e)
+			{
+				global::err(e.what());
+				global::err("forward gradient failed");
+			}
+		};
+
+		std::vector<std::future<void>*> grad_threads;
+		grad_threads.resize(geomodel.size());
+		for (size_t i = 0; i < geomodel.size(); ++i)
+		{
+			grad_threads[i] = new std::future<void>(std::async(std::launch::async, grad_thread, i));
+		}
+
+		for (size_t i = 0; i < geomodel.size(); ++i)
+		{
+			grad_threads[i]->wait();
+			delete grad_threads[i];
+		}
+		return grads;
 	}
 };

@@ -30,6 +30,7 @@ public:
 
 	forward_data() : data_model_base()
 	{
+		data.resize(_data_content_count());
 	}
 
 	forward_data(const forward_data& f) : data_model_base(f)
@@ -133,6 +134,7 @@ public:
 	isometric_model() : data_model_base()
 	{
 		layer_height = 0;
+		data.resize(_data_content_count());
 	}
 
 	isometric_model(const isometric_model& g) : data_model_base(g)
@@ -190,7 +192,10 @@ class geoelectric_model : public data_model_base
 
 public:
 
-	geoelectric_model() = default;
+	geoelectric_model() : data_model_base()
+	{
+		data.resize(_data_content_count());
+	}
 
 	geoelectric_model(const geoelectric_model& f) = default;
 

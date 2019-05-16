@@ -55,7 +55,7 @@ namespace global
 				try
 				{
 					time_point end = clk.now();
-					auto t = std::chrono::duration_cast<duration>(end - begin).count() / 1000;
+					auto t = std::chrono::duration_cast<duration>(end - begin).count();
 
 					std::stringstream msg;
 					msg << name << " executed in " << t << "ms";

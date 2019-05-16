@@ -14,10 +14,13 @@ class data_model_base:
         self.b[idx] = item
 
     def set_item_s(self, idx: str, item):
-        self.b[idx] = item
+        self.b[idx] = data_py.vector_float_t(item)
 
     def __len__(self):
         return self.count
+
+    def resize(self, size: int):
+        self.b.resize(size)
 
     def get_count(self):
         return self.b.count
@@ -46,15 +49,39 @@ class data_model_base:
 
 
 class geoelectric_model(data_model_base):
+    resistivity_str = 'resistivity'
+    height_str = 'height'
 
     def __init__(self):
         self.b = data_py.geoelectric_model()
 
+    def get_resistivity(self):
+        return self.b[self.resistivity_str]
+
+    def set_resistivity(self, res):
+        self.b[self.resistivity_str] = res
+
+    def get_height(self):
+        return self.b[self.height_str]
+
+    def set_height(self, h):
+        self.b[self.height_str] = h
+
+    resistivity = property(get_resistivity, set_resistivity)
+    height = property(get_height, set_height)
+
 
 class isometric_model(data_model_base):
+    resistivity_str = 'resistivity'
 
     def __init__(self):
         self.b = data_py.isometric_model()
+
+    def get_resistivity(self):
+        return self.b[self.resistivity_str]
+
+    def set_resistivity(self, res):
+        self.b[self.resistivity_str] = res
 
     def get_height(self):
         return self.b.layer_height
@@ -62,6 +89,7 @@ class isometric_model(data_model_base):
     def set_height(self, height: float):
         self.b.layer_height = height
 
+    resistivity = property(get_resistivity, set_resistivity)
     height = property(get_height, set_height)
 
 
@@ -72,6 +100,8 @@ def iso_to_geo(iso: isometric_model) -> geoelectric_model:
 
 
 class forward_data(data_model_base):
+    time_str = 'time'
+    response_str = 'response'
 
     def __init__(self):
         self.b = data_py.forward_data()
@@ -81,6 +111,21 @@ class forward_data(data_model_base):
 
     def generate_default_time_stamp(self):
         self.b.generate_default_time_stamp()
+
+    def get_time(self):
+        return self.b[self.time_str]
+
+    def set_time(self, res):
+        self.b[self.time_str] = res
+
+    def get_response(self):
+        return self.b[self.response_str]
+
+    def set_response(self, h):
+        self.b[self.response_str] = h
+
+    time = property(get_time, set_time)
+    response = property(get_response, set_response)
 
 
 class filter_coefficient:
@@ -119,7 +164,11 @@ class forward_gpu:
         self.fw.test_cuda_device()
 
     def forward(self):
-        self.fw.forward()
+        try:
+            self.fw.forward()
+        except Exception as e:
+            print(repr(e))
+            raise e
 
     def get_result_late_m(self) -> forward_data:
         ret = forward_data()

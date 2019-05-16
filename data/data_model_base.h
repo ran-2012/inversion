@@ -215,6 +215,19 @@ public:
 		}
 	}
 
+	virtual void resize(size_type size)
+	{
+		count = size;
+		for (auto& item : data)
+		{
+			item.resize(size);
+		}
+		for (size_type i = 0; i < size; ++i)
+		{
+			(*this)[index_name][i] = i + 1;
+		}
+	}
+
 	virtual size_type size() const
 	{
 		return data[0].size();

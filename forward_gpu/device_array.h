@@ -72,7 +72,10 @@ namespace gpu
 		 */
 		__host__ void save_data(vector& vec) const
 		{
-			assert(device_mem.get());
+			if(!device_mem.get())
+			{
+				throw std::runtime_error("device_mem not available");
+			}
 			float_ptr host_mem(new float_t[device_mem_size]);
 
 			copy_to_host(device_mem.get(), host_mem.get(), device_mem_size);

@@ -49,12 +49,15 @@ void forward_test()
 	forward_gpu f;
 
 	filter_coefficient coef;
-	geoelectric_model geo;
+	geoelectric_model geo, geo2;
+	isometric_model iso;
 	forward_data data;
 
 	coef.load_cos_coef("../test_data/cos_xs.txt");
 	coef.load_hkl_coef("../test_data/hankel1.txt");
 	geo.load_from_file("../test_data/test_geo_model.json");
+	iso.load_from_file("../test_data/test_iso_model.json");
+	geo2 = iso;
 	data.generate_time_stamp_by_count(-5, 0, 40);
 
 	f.load_general_params(10, 100, 50);
@@ -76,7 +79,28 @@ void forward_test()
 		std::cout << i << ' ' << t[i] << ' ' << r[i] << std::endl;
 	}
 
+	LOG("serieal");
+	{
+		TIMER();
+		f.load_geo_model(geo2);
+
+		for (size_t i = 0; i < geo2.size(); ++i)
+		{
+			geo2["resistivity"][i] += 10;
+			f.load_geo_model(geo2);
+			f.forward();
+		}
+	}
+
+	LOG("parellal");
+	f.load_geo_model(geo2);
+	auto grads = f.gradient(10);
+
 	LOG("forward_test end");
+}
+
+void clock_test()
+{
 }
 
 int main() noexcept

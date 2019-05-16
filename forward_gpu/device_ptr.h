@@ -70,6 +70,7 @@ namespace gpu
 				return;
 			}
 			auto err = cudaFree(device_mem);
+			CHECK;
 			device_mem = nullptr;
 		}
 	};
