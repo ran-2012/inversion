@@ -6,6 +6,7 @@ import forward
 import helper
 
 log = helper.get_logger()
+log.propagate = False
 
 
 def forward_result(f: forward.forward_gpu, res: list, height: float):
@@ -49,8 +50,8 @@ def inversion():
     response_m = m['response']
 
     res_geo = forward.isometric_model()
-    res_geo.resize(10)
-    res_geo.height = 20
+    res_geo.resize(5)
+    res_geo.height = 50
     res_geo.name = 'inversion'
 
     height = res_geo.height
@@ -62,8 +63,9 @@ def inversion():
     class forward_model(tf.keras.Model):
         def __init__(self):
             super(Model, self).__init__()
-            self.resistivity = tf.contrib.eager.Variable(tf.random.uniform([count], minval=50.0, maxval=200))
-            # self.resistivity = tf.contrib.eager.Variable(tf.fill([count], 150.0))
+            # self.resistivity = tf.contrib.eager.Variable(tf.random.uniform([count], minval=50.0, maxval=200))
+            self.resistivity = tf.contrib.eager.Variable(tf.fill([count], 150.0))
+            # self.resistivity = tf.contrib.eager.Variable([100.0, 50.0, 50.0, 200.0, 200.0])
 
         def call(self, inputs, **kwargs):
             return forward_nn(self.resistivity)
@@ -97,9 +99,9 @@ def inversion():
     tf.enable_eager_execution()
     with tf.device('/cpu:0'):
         model = forward_model()
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=10)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=200)
 
-        for i in range(20):
+        for i in range(10):
             grads, loss = grad(model, None, response_m)
             optimizer.apply_gradients(zip([grads], [model.resistivity]),
                                       global_step=tf.train.get_or_create_global_step())

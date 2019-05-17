@@ -24,7 +24,7 @@ protected:
 	using json = nlohmann::json;
 
 	static constexpr char index_name[] = "idx";
-	static constexpr char default_version[] = "0.3.4";
+	static constexpr char default_version[] = "0.3.5";
 	static constexpr char default_comment[] = "";
 
 	static void throw_critical_data_miss_exception(const string& data_name)
