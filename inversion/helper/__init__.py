@@ -7,7 +7,6 @@ from forward import forward_data
 
 
 def get_logger():
-
     _log = logging.getLogger('local')
     _log.setLevel(logging.DEBUG)
     _log.propagate = False
@@ -62,7 +61,8 @@ def draw_resistivity(*model_list, **kwargs):
         draw_list.append(draw_item)
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, xlabel='height', ylabel='resistivity')
+    ax = fig.add_subplot(1, 1, 1, xlabel='height/m', ylabel='resistivity/Ωm',
+                         ylim=[0, 300])
 
     for draw_item, g in zip(draw_list, model_list):
         ax.plot(draw_item[0], draw_item[1], label=g.name)
@@ -77,7 +77,7 @@ def draw_forward_result(forward_result: forward_data, *args):
         result_list += args
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, xlabel='time', ylabel='response')
+    ax = fig.add_subplot(1, 1, 1, xlabel='time/s', ylabel='a-resistivity')
 
     for f in result_list:
         ax.loglog(f['time'], f['response'], label=f.name)

@@ -2,6 +2,8 @@
 import tensorflow as tf
 from tensorflow.python.keras import Model
 
+import random
+
 import forward
 import helper
 
@@ -34,7 +36,7 @@ def inversion():
     coef.load_hkl_coef('../test_data/hankel1.txt')
 
     time = forward.forward_data()
-    time.generate_time_stamp_by_count(-5, 0, 100)
+    time.generate_time_stamp_by_count(-5, 0, 20)
 
     f.load_general_params(10, 100, 50)
     f.load_filter_coef(coef)
@@ -44,9 +46,9 @@ def inversion():
     f.forward()
 
     m = f.get_result_late_m()
-    m.name = 'res late_m'
+    m.name = 'Model A'
 
-    helper.add_noise(m, 0.05)
+    # helper.add_noise(m, 0.05)
     response_m = m['response']
 
     res_geo = forward.isometric_model()
@@ -71,18 +73,27 @@ def inversion():
             return forward_nn(self.resistivity)
 
     def loss_func(inputs, targets):
+        norm_2_factor = 1000
+        norm_inf_factor = 10
+
         r = npy.zeros(npy.shape(inputs))
+
         for r_i in range(1, len(r)):
             r[r_i] = inputs[r_i] - inputs[r_i - 1]
 
         r = npy.square(r / height)
         r_loss = npy.sum(r)
 
-        relative_error = (forward_nn(inputs) - npy.array(targets))
-        return tf.reduce_mean(tf.square(relative_error / npy.array(targets))) + r_loss
+        forward_res = forward_nn(inputs)
+
+        relative_error = (forward_res - npy.array(targets)) / npy.array(targets)
+
+        return norm_2_factor * npy.mean(npy.square(relative_error)) \
+               + r_loss \
+               + norm_inf_factor * npy.max(relative_error)
 
     def grad(forward_model, inputs, targets):
-        step = 1.0
+        step = 10.0
 
         cur_loss = loss_func(forward_model.resistivity.numpy(), targets)
 
@@ -96,32 +107,51 @@ def inversion():
 
         return tf.convert_to_tensor(grads_, dtype=tf.float32), cur_loss
 
+    def rand_grad(forward_model, inputs, targets):
+        step = 10.0
+
+        cur_loss = loss_func(forward_model.resistivity.numpy(), targets)
+
+        grads_ = npy.zeros([count])
+
+        idx = random.randint(0, count - 1)
+
+        temp_res = forward_model.resistivity.numpy().copy()
+        temp_res[idx] += step
+        temp_loss = loss_func(temp_res, targets)
+
+        grads_[idx] = (temp_loss - cur_loss) / step
+
+        return tf.convert_to_tensor(grads_, dtype=tf.float32), cur_loss
+
     tf.enable_eager_execution()
     with tf.device('/cpu:0'):
         model = forward_model()
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=200)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=1)
 
-        for i in range(10):
-            grads, loss = grad(model, None, response_m)
+        for i in range(500):
+            grads, loss = rand_grad(model, None, response_m)
             optimizer.apply_gradients(zip([grads], [model.resistivity]),
                                       global_step=tf.train.get_or_create_global_step())
 
-            log.info('loop %d completed, loss = %d' % (i, loss))
+            log.info('loop %d completed, loss = %f' % (i, loss))
 
-        res_geo.set_item_s('resistivity', model.resistivity.numpy().tolist())
+            if i % 100 == 0:
+                res_geo.set_item_s('resistivity', model.resistivity.numpy().tolist())
+                res_geo.name='Inversion'
+                f.load_geo_model(forward.iso_to_geo(res_geo))
 
-    f.load_geo_model(forward.iso_to_geo(res_geo))
+                f.forward()
+                res_response_m = f.get_result_late_m()
+                res_response_m.name = 'Inversion'
 
-    f.forward()
-    res_response_m = f.get_result_late_m()
+                fig = helper.draw_resistivity(raw_geo, forward.iso_to_geo(res_geo), last_height=240)
+                fig.show()
 
-    fig = helper.draw_resistivity(raw_geo, forward.iso_to_geo(res_geo))
-    fig.show()
+                fig = helper.draw_forward_result(m, res_response_m)
+                fig.show()
 
-    fig = helper.draw_forward_result(m, res_response_m)
-    fig.show()
-
-    input('press any key')
+                pass
 
 
 if __name__ == '__main__':
