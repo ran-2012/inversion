@@ -26,8 +26,9 @@ public:
 	geoelectric_model geomodel;
 
 	forward_data time_stamp;
-	forward_data data_late_e;
-	forward_data data_late_m;
+	forward_data magnetic;
+	forward_data a_resistivity_late_e;
+	forward_data a_resistivity_late_m;
 
 	virtual bool check_coef()
 	{
@@ -66,8 +67,9 @@ public:
 	virtual void forward() = 0;
 	virtual std::vector<vector> gradient(float_t step = 1) = 0;
 
-	virtual forward_data get_result_late_m() { return data_late_m; }
-	virtual forward_data get_result_late_e() { return data_late_e; }
+	virtual forward_data get_result_magnetic() { return magnetic; }
+	virtual forward_data get_result_late_m() { return a_resistivity_late_m; }
+	virtual forward_data get_result_late_e() { return a_resistivity_late_e; }
 };
 
 class forward_gpu final : public forward_base
@@ -142,8 +144,9 @@ public:
 			time_stamp.generate_default_time_stamp();
 		}
 
-		data_late_m = time_stamp;
-		data_late_e = time_stamp;
+		magnetic = time_stamp;
+		a_resistivity_late_m = time_stamp;
+		a_resistivity_late_e = time_stamp;
 
 		try
 		{
@@ -151,10 +154,11 @@ public:
 			             filter.get_cos(), filter.get_hkl(),
 			             geomodel["resistivity"], geomodel["height"],
 			             time_stamp["time"],
-			             data_late_m["response"], data_late_e["response"]);
+			             magnetic["response"],
+			             a_resistivity_late_m["response"], a_resistivity_late_e["response"]);
 
 			//电场响应的最后一组数据是无效的
-			data_late_e.pop_back();
+			a_resistivity_late_e.pop_back();
 		}
 		catch (std::exception& e)
 		{

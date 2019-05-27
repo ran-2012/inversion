@@ -166,9 +166,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="forward_py.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="forward.h" />
   </ItemGroup>
   <ItemGroup>

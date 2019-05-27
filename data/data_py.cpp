@@ -94,8 +94,9 @@ PYBIND11_MODULE(data_py, m)
 	fw.def_readwrite("filter", &forward_gpu::filter);
 	fw.def_readwrite("geo_model", &forward_gpu::geomodel);
 	fw.def_readwrite("time_stamp", &forward_gpu::time_stamp);
-	fw.def_readwrite("data_late_e", &forward_gpu::data_late_e);
-	fw.def_readwrite("data_late_m", &forward_gpu::data_late_m);
+	fw.def_readwrite("magnetic", &forward_gpu::magnetic);
+	fw.def_readwrite("a_resistivity_late_e", &forward_gpu::a_resistivity_late_e);
+	fw.def_readwrite("a_resistivity_late_m", &forward_gpu::a_resistivity_late_m);
 
 	fw.def("load_general_params", &forward_gpu::load_general_params_s);
 	fw.def("load_geo_model", &forward_gpu::load_geo_model);
@@ -108,6 +109,7 @@ PYBIND11_MODULE(data_py, m)
 	fw.def("forward", &forward_gpu::forward);
 	fw.def("gradient", &forward_gpu::gradient);
 
+	fw.def("get_result_magnetic", &forward_gpu::get_result_magnetic);
 	fw.def("get_result_late_m", &forward_gpu::get_result_late_m);
 	fw.def("get_result_late_e", &forward_gpu::get_result_late_e);
 }

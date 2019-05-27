@@ -20,11 +20,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="forward_py.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

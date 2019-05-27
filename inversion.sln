@@ -25,13 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "data", "data\data.vcxproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21C5EFB0-1B78-4CBA-89EC-F4FEF12AA153}"
 	ProjectSection(SolutionItems) = preProject
-		Ps_all\ATEM_1D_Hz.m = Ps_all\ATEM_1D_Hz.m
-		data_load_test.json = data_load_test.json
-		Ps_all\dHzt_to_Hz.m = Ps_all\dHzt_to_Hz.m
 		readme.md = readme.md
-		Ps_all\Return_dHz_w.m = Ps_all\Return_dHz_w.m
-		Ps_all\Return_Hz_t.m = Ps_all\Return_Hz_t.m
-		test_geo_model.json = test_geo_model.json
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "global", "global\global.vcxproj", "{A35D840B-C760-41FF-891E-408ACB12AC1D}"

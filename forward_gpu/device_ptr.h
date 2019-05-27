@@ -70,7 +70,14 @@ namespace gpu
 				return;
 			}
 			auto err = cudaFree(device_mem);
-			CHECK;
+			try
+			{
+				CHECK;
+			}
+			catch (...)
+			{
+				global::err("error during release memory");
+			}
 			device_mem = nullptr;
 		}
 	};

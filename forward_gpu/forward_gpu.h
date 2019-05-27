@@ -20,16 +20,18 @@ namespace gpu
 	 * \param h 发射、接收回线高度(m)
 	 * \param cosine 余弦变换系数
 	 * \param hankel 汉克尔变换系数
-	 * \param resistivity 地层电阻率
-	 * \param height 地层厚度
-	 * \param time 时间
-	 * \param response_late_m 晚期磁场响应
-	 * \param response_late_e 晚期电场响应
+	 * \param resistivity 地层电阻率(Om)
+	 * \param height 地层厚度(m)
+	 * \param time 时间(s)
+	 * \param magnetic 磁场强度(nT)
+	 * \param a_resistivity_late_m 晚期磁场视电阻率
+	 * \param a_resistivity_late_e 晚期感应电动势视电阻率
 	 */
 	void forward(float_t a, float_t i0, float_t h,
 	             const vector& cosine, const vector& hankel,
 	             const vector& resistivity, const vector& height,
 	             const vector& time,
-	             vector& response_late_m,
-	             vector& response_late_e);
+	             vector& magnetic,
+	             vector& a_resistivity_late_m,
+	             vector& a_resistivity_late_e);
 }

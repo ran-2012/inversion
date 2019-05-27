@@ -81,7 +81,7 @@ namespace gpu
 		for (int k = 0; k < hankel_size; ++k)
 		{
 			const complex i(0, 1);
-			const float_t lmd = 1 / a * pow(10.0, a1 + (k * s1));
+			const float_t lmd = 1 / a * pow(10.0, a1 + k * s1);
 			const float_t lmd_2 = pow(lmd, 2);
 
 			const complex wi = i * w * mu0;
@@ -166,16 +166,16 @@ namespace gpu
 
 		if (cosine_idx == 0)
 		{
-			b->get()[time_idx] = sqrt(2 / pi) / t * res[0];
+			b->get()[time_idx] = 1000 * sqrt(2 / pi) / t * res[0];
 		}
 	}
 
 
-	__global__ void calc_response_kernel(float_t a, float_t i0, float_t h,
-	                                     device_array* b,
-	                                     device_array* time,
-	                                     device_array* response_late_m,
-	                                     device_array* response_late_e)
+	__global__ void calc_apparent_resistivity_kernel(float_t a, float_t i0, float_t h,
+	                                                 device_array* b,
+	                                                 device_array* time,
+	                                                 device_array* response_late_m,
+	                                                 device_array* response_late_e)
 	{
 		const int time_idx = threadIdx.x;
 
@@ -276,7 +276,8 @@ namespace gpu
 	             const vector& cosine, const vector& hankel,
 	             const vector& resistivity, const vector& height,
 	             const vector& time,
-	             vector& response_late_m, vector& response_late_e)
+	             vector& magnetic,
+	             vector& a_resistivity_late_m, vector& a_resistivity_late_e)
 	{
 		device_array cosine_d(cosine);
 		device_array hankel_d(hankel);
@@ -285,7 +286,7 @@ namespace gpu
 		device_array height_d(height);
 		device_array time_d(time);
 
-		device_array b(time.size());
+		device_array magnetic_d(time.size());
 		device_array late_m_d(time.size());
 		device_array late_e_d(time.size());
 
@@ -293,7 +294,7 @@ namespace gpu
 			a, i0, h,
 			cosine_d.get_device_ptr(), hankel_d.get_device_ptr(),
 			res_d.get_device_ptr(), height_d.get_device_ptr(),
-			time_d.get_device_ptr(), b.get_device_ptr());
+			time_d.get_device_ptr(), magnetic_d.get_device_ptr());
 		auto err = cudaDeviceSynchronize();
 		CHECK;
 
@@ -302,16 +303,17 @@ namespace gpu
 		b.save_data(test_b);
 #endif
 
-		calc_response_kernel << <1, time_d.size() >> >(
+		calc_apparent_resistivity_kernel << <1, time_d.size() >> >(
 			a, i0, h,
-			b.get_device_ptr(),
+			magnetic_d.get_device_ptr(),
 			time_d.get_device_ptr(),
 			late_m_d.get_device_ptr(),
 			late_e_d.get_device_ptr());
 		err = cudaDeviceSynchronize();
 		CHECK;
 
-		late_m_d.save_data(response_late_m);
-		late_e_d.save_data(response_late_e);
+		magnetic_d.save_data(magnetic);
+		late_m_d.save_data(a_resistivity_late_m);
+		late_e_d.save_data(a_resistivity_late_e);
 	}
 }

@@ -170,6 +170,11 @@ class forward_gpu:
             print(repr(e))
             raise e
 
+    def get_result_magnetic(self) -> forward_data:
+        ret = forward_data()
+        ret.b = self.fw.get_result_magnetic()
+        return ret
+
     def get_result_late_m(self) -> forward_data:
         ret = forward_data()
         ret.b = self.fw.get_result_late_m()

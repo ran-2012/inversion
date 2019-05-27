@@ -7,7 +7,7 @@ import numpy as np
 import forward
 from helper import *
 
-
+# 数据加载测试
 def data_test():
     try:
         print('data_test begin')
@@ -26,7 +26,7 @@ def data_test():
     finally:
         log.debug("data_test finished")
 
-
+# cuda测试
 @timer
 def cuda_test():
     g = forward.forward_gpu()
@@ -34,9 +34,10 @@ def cuda_test():
     g.test_cuda_device()
     print("cuda_test finished")
 
-
+# 正演测试
 def forward_test():
     try:
+        # 正演类
         f = forward.forward_gpu()
         coef = forward.filter_coefficient()
         geo = forward.geoelectric_model()
@@ -44,29 +45,35 @@ def forward_test():
         iso = forward.isometric_model()
         data = forward.forward_data()
 
+        # 各种数据加载
         coef.load_cos_coef('../test_data/cos_xs.txt')
         coef.load_hkl_coef('../test_data/hankel1.txt')
         geo.load_from_file('../test_data/test_geo_model.json')
         geo2.load_from_file('../test_data/test_geo_model2.json')
         iso.load_from_file('../test_data/test_iso_model.json')
-        data.generate_time_stamp_by_count(-5, 0, 100)
+        data.generate_time_stamp_by_count(-5, -2, 20)
 
+        # 测试绘制地电模型
         fig = draw_resistivity(geo, geo2, forward.iso_to_geo(iso), last_height=300)
         fig.show()
 
+        # 正演类加载数据
         f.load_general_params(10, 100, 50)
         f.load_filter_coef(coef)
         f.load_geo_model(geo)
         f.load_time_stamp(data)
 
+        # 正演开始
         f.forward()
 
+        # 获得结果
         m = f.get_result_late_m()
         e = f.get_result_late_e()
 
         m.name = 'late_m'
         e.name = 'late_e'
 
+        # 绘制结果
         fig = draw_forward_result(m, e)
         fig.show()
 

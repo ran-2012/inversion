@@ -25,7 +25,7 @@ def forward_test():
 
         coef.load_cos_coef('../test_data/cos_xs.txt')
         coef.load_hkl_coef('../test_data/hankel1.txt')
-        data.generate_time_stamp_by_count(-5, 0, 80)
+        data.generate_time_stamp_by_count(-5, -2, 40)
 
         f.load_general_params(10, 100, 50)
         f.load_filter_coef(coef)
@@ -37,14 +37,18 @@ def forward_test():
             f.load_geo_model(geos[i])
             f.forward()
 
-            responses[i] = f.get_result_late_m()
+            responses[i] = f.get_result_magnetic()
             responses[i].name = geos[i].name
 
         fig = draw_resistivity(*geos)
-        plt.savefig(figure=fig, fname='geo.png')
+        fig.show()
 
         fig = draw_forward_result(*responses)
-        plt.savefig(figure=fig, fname='response.png')
+        fig.show()
+
+        # print(loss(responses[0], responses[1]))
+
+        # print(loss(responses[1], responses[2]))
         # fig.show()
 
         # fig = draw_forward_result(m)

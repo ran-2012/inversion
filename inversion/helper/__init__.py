@@ -77,7 +77,7 @@ def draw_forward_result(forward_result: forward_data, *args):
         result_list += args
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, xlabel='time/s', ylabel='a-resistivity')
+    ax = fig.add_subplot(1, 1, 1, xlabel='time/s', ylabel='B/nT')
 
     for f in result_list:
         ax.loglog(f['time'], f['response'], label=f.name)
@@ -103,3 +103,10 @@ def add_noise(f: forward_data, ratio=0.05):
         response[i] += npy.random.normal(0, response[i] * ratio, )
 
     f.set_item_s('response', response)
+
+
+def loss(f_1: forward_data, f_2: forward_data):
+    n_1 = npy.array(f_1['response'])
+    n_2 = npy.array(f_2['response'])
+
+    return npy.mean(npy.square((n_1 - n_2) / n_1))

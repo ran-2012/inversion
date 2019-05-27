@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ebfc8aa6-4463-4102-831b-e6d2175c665a</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>f.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,7 +25,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="f.py">
+    <Compile Include="compare_matlab.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="forward_calc.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="forward\__init__.py">
@@ -34,9 +38,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="inversion.py" />
-    <Compile Include="n.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="multi_compare.py" />
     <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
